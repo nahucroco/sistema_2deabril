@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -34,9 +35,12 @@ class StoryPostViewSet(viewsets.ModelViewSet):
                 {"detail": "Esta historia ya se esta publicando o ya se publico."},
                 status=status.HTTP_409_CONFLICT,
             )
-        publicar_post.delay(post.id)
+        # Primero se marca PUBLICANDO y recien despues de guardar se encola:
+        # si se encolaba antes, un worker rapido podia dejarla PUBLICADA y
+        # esta vista la pisaba de vuelta a PUBLICANDO para siempre.
         post.estado = StoryPost.Estado.PUBLICANDO
         post.save(update_fields=["estado"])
+        transaction.on_commit(lambda: publicar_post.delay(post.id))
         return Response(self.get_serializer(post).data)
 
     @action(detail=False, methods=["post"])

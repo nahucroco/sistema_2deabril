@@ -18,6 +18,11 @@ def publicar_post(post_id: int) -> None:
         logger.warning("publicar_post: StoryPost %s no existe", post_id)
         return
 
+    if post.estado == StoryPost.Estado.PUBLICADA:
+        # Una tarea duplicada en la cola no tiene que publicarla dos veces en Instagram.
+        logger.info("publicar_post: StoryPost %s ya estaba publicada, se ignora", post_id)
+        return
+
     post.estado = StoryPost.Estado.PUBLICANDO
     post.error_mensaje = ""
     post.save(update_fields=["estado", "error_mensaje"])
@@ -50,8 +55,15 @@ def publish_due_posts() -> None:
     vencidas = StoryPost.objects.filter(
         estado=StoryPost.Estado.PROGRAMADA, programada_para__lte=ahora
     )
-    for post in vencidas:
-        publicar_post.delay(post.id)
+    for post_id in vencidas.values_list("id", flat=True):
+        # Se pasa a PUBLICANDO antes de encolar, y solo si sigue PROGRAMADA:
+        # asi la proxima corrida de beat (o una corrida en paralelo) no la
+        # vuelve a encolar mientras el worker todavia no la tomo.
+        tomada = StoryPost.objects.filter(pk=post_id, estado=StoryPost.Estado.PROGRAMADA).update(
+            estado=StoryPost.Estado.PUBLICANDO
+        )
+        if tomada:
+            publicar_post.delay(post_id)
 
 
 @shared_task

@@ -32,6 +32,10 @@ async function request(path, options = {}) {
 }
 
 export const api = {
+  sesion: () => request("/sesion/"),
+  iniciarSesion: (usuario, clave) =>
+    request("/sesion/iniciar/", { method: "POST", body: JSON.stringify({ usuario, clave }) }),
+  cerrarSesion: () => request("/sesion/cerrar/", { method: "POST" }),
   cuentas: () => request("/cuentas/"),
   historias: () => request("/historias/"),
   crearHistoria: (formData) =>

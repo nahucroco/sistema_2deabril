@@ -17,3 +17,6 @@ frontend/.env
 .vscode/
 .idea/
 .DS_Store
+
+# Secretos de produccion
+.env.prod

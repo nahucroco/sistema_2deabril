@@ -131,3 +131,53 @@ class RefreshExpiringTokensTests(TestCase):
         b.refresh_from_db()
         self.assertEqual(a.access_token, "tok-a")
         self.assertEqual(b.access_token, "nuevo-b")
+
+
+class MarcarPublicacionesColgadasTests(MediaTemporalMixin, TestCase):
+    def setUp(self):
+        self.cuenta = crear_cuenta()
+
+    def _post_publicando_hace(self, minutos):
+        post = crear_post(self.cuenta, estado=StoryPost.Estado.PUBLICANDO)
+        StoryPost.objects.filter(pk=post.pk).update(actualizado=timezone.now() - timedelta(minutes=minutos))
+        return post
+
+    def test_pasa_a_error_las_que_llevan_mucho_en_publicando(self):
+        colgada = self._post_publicando_hace(30)
+        reciente = self._post_publicando_hace(2)
+
+        self.assertEqual(tasks.marcar_publicaciones_colgadas(), 1)
+
+        colgada.refresh_from_db()
+        reciente.refresh_from_db()
+        self.assertEqual(colgada.estado, StoryPost.Estado.ERROR)
+        self.assertIn("interrumpió", colgada.error_mensaje)
+        self.assertEqual(reciente.estado, StoryPost.Estado.PUBLICANDO)
+
+    @mock.patch("stories.tasks.publicar_post.delay")
+    def test_una_programada_hace_rato_que_recien_se_toma_no_cuenta_como_colgada(self, _delay):
+        """publish_due_posts la pasa a PUBLICANDO con un .update(): tiene que renovar 'actualizado'."""
+        post = crear_post(
+            self.cuenta, estado=StoryPost.Estado.PROGRAMADA, programada_para=timezone.now() - timedelta(hours=2)
+        )
+        StoryPost.objects.filter(pk=post.pk).update(actualizado=timezone.now() - timedelta(hours=3))
+
+        tasks.publish_due_posts()
+        tasks.marcar_publicaciones_colgadas()
+
+        post.refresh_from_db()
+        self.assertEqual(post.estado, StoryPost.Estado.PUBLICANDO)
+
+
+class TareasPeriodicasCommandTests(TestCase):
+    @mock.patch("stories.tasks.refresh_expiring_tokens")
+    @mock.patch("stories.tasks.publish_due_posts")
+    @mock.patch("stories.tasks.marcar_publicaciones_colgadas")
+    def test_corre_las_tres_tareas(self, colgadas, programadas, tokens):
+        from django.core.management import call_command
+
+        call_command("tareas_periodicas")
+
+        colgadas.assert_called_once_with()
+        programadas.assert_called_once_with()
+        tokens.assert_called_once_with()

@@ -1,0 +1,83 @@
+# Produccion en un solo servidor (por ejemplo la VM gratis de Oracle Cloud).
+# Guia completa: docs/deploy_oracle.md
+#
+#   cp deploy/.env.prod.example .env.prod   # y completar
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+#
+# Sin Redis ni Celery: "Publicar ahora" publica en el mismo request
+# (CELERY_TASK_ALWAYS_EAGER) y el contenedor "tareas" corre cada 5 minutos
+# las historias programadas y el destrabe de publicaciones colgadas.
+
+x-backend: &backend
+  build: ./backend
+  restart: unless-stopped
+  env_file: .env.prod
+  environment:
+    DEBUG: "False"
+    ALLOWED_HOSTS: ${DOMAIN}
+    CSRF_TRUSTED_ORIGINS: https://${DOMAIN}
+    PUBLIC_MEDIA_BASE_URL: https://${DOMAIN}/media
+    DATABASE_URL: postgres://sistema:${POSTGRES_PASSWORD}@db:5432/sistema_2deabril
+    CELERY_TASK_ALWAYS_EAGER: "True"
+    NUM_PROXIES: "1"
+  volumes:
+    - media:/app/media
+  depends_on:
+    db:
+      condition: service_healthy
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sistema_2deabril
+      POSTGRES_USER: sistema
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env.prod}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sistema -d sistema_2deabril"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    <<: *backend
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 90 --access-logfile -"
+    volumes:
+      - media:/app/media
+      - static:/app/staticfiles
+
+  tareas:
+    <<: *backend
+    # Espera antes de cada corrida (incluida la primera, asi el backend llega a aplicar las migraciones).
+    command: sh -c "while true; do sleep 60; python manage.py tareas_periodicas; sleep 240; done"
+
+  caddy:
+    build:
+      context: .
+      dockerfile: deploy/Caddy.Dockerfile
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:?Falta DOMAIN en .env.prod}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - media:/srv/media:ro
+      - static:/srv/static:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
+  media:
+  static:
+  caddy_data:
+  caddy_config:

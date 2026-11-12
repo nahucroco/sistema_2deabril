@@ -63,7 +63,12 @@ npm run dev
 Abre en `http://localhost:5173`. En desarrollo, Vite proxea `/api` hacia
 `http://localhost:8000` (el backend de Django).
 
-### Con Docker
+### Produccion
+
+Deploy gratis en Oracle Cloud con Docker Compose + Caddy (HTTPS automatico):
+ver `docs/deploy_oracle.md`.
+
+### Con Docker (desarrollo)
 
 ```bash
 cp backend/.env.example backend/.env   # completar antes de levantar
@@ -76,7 +81,10 @@ docker compose up --build
       Claude, descarga en PNG.
 - [x] Backend con el modelo de datos y la integración con la Graph API de
       Meta lista para publicar y programar.
-- [ ] Conectar la cuenta real del local (manual, ver `docs/instagram_setup.md`).
+- [x] Cuenta real del local conectada (Unified login, ver `docs/instagram_setup.md`)
+      y primera historia publicada por API.
+- [x] Login para usar el Taller en produccion.
+- [ ] Deploy en Oracle Cloud (ver `docs/deploy_oracle.md`).
 - [ ] Posts de feed y Reels (hoy el foco es historias).
 - [ ] Bandeja de comentarios/mensajes de Instagram con respuestas sugeridas.
 

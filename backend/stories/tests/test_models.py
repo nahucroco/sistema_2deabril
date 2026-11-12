@@ -34,7 +34,7 @@ class StoryPostTests(MediaTemporalMixin, TestCase):
         post = crear_post(self.cuenta)
         self.assertEqual(post.estado, StoryPost.Estado.BORRADOR)
 
-    @override_settings(PUBLIC_MEDIA_BASE_URL="https://bici2deabril.example")
+    @override_settings(PUBLIC_MEDIA_BASE_URL="https://bici2deabril.example/media/")
     def test_imagen_url_publica_es_absoluta(self):
         post = crear_post(self.cuenta)
         self.assertTrue(post.imagen_url_publica.startswith("https://bici2deabril.example/media/historias/"))

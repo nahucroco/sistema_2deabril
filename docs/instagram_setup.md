@@ -1,65 +1,82 @@
 # Conectar la cuenta de Instagram del local
 
-Esto hay que hacerlo una sola vez, a mano. No hay forma de automatizarlo
-por API: Meta exige que estos pasos se hagan desde la interfaz, con el
-dueño de la cuenta.
+Se hace una sola vez. Son pasos manuales en Instagram y en el panel de Meta
+(no se pueden automatizar), y al final un comando que guarda el token.
 
-## 1. Pasar la cuenta a profesional, tipo Empresa
+La app usa la **API de Instagram con inicio de sesión unificado** (Unified
+login): es la única opción que Meta ofrece a las apps nuevas, no necesita
+página de Facebook y genera un token que **no vence**.
 
-1. Abrí Instagram desde el celular con la cuenta del local.
-2. Configuración → Cuenta → Cambiar a cuenta profesional.
-3. Elegí **Empresa** (no "Creador": la API de publicación de contenido no
-   funciona de forma confiable con cuentas de Creador — mejor evitar esa
-   confusión directamente).
-4. Si todavía no existe, te va a pedir vincular una **página de Facebook**.
-   Podés crear una página nueva solo para esto, no hace falta que el local
-   la use activamente.
+## 1. Pasar la cuenta a profesional, tipo Negocio
+
+En Instagram: Configuración → Tipo de cuenta y herramientas → Cambiar a
+cuenta profesional → **Negocio** (no "Creador"). La página de Facebook es
+opcional: se puede saltear.
 
 ## 2. Crear la app en Meta for Developers
 
-1. Entrá a https://developers.facebook.com/apps y creá una app nueva, tipo
-   "Business".
-2. Dentro de la app, agregá el producto **Instagram** (Instagram API with
-   Instagram Login, o el flujo equivalente que te muestre el panel —
-   Meta lo reordena de tanto en tanto).
-3. Anotá el **App ID** y el **App Secret**: van en el `.env` del backend
-   (`META_APP_ID`, `META_APP_SECRET`).
+Hace falta una **cuenta de Facebook** (puede ser la personal de quien
+administra el sistema; el Instagram del local se vincula después).
 
-## 3. Conectar la cuenta y generar el token
+1. https://developers.facebook.com/apps → **Crear app**.
+2. Nombre sin las palabras Instagram/Facebook/Meta (ej. "Sistema 2 de Abril").
+3. Caso de uso: **Administrar mensajes y contenido en Instagram**.
+4. Portfolio comercial: el del local (**Bicicletería 2 de Abril**). Si no
+   aparece, desde Meta Business Suite (con la sesión del Instagram) andá a
+   Configuración → Usuarios → Personas → Invitar a personas, invitá al correo
+   de tu Facebook con control total, aceptá la invitación y volvé a este paso.
 
-1. En el panel de la app, usá el flujo de login/autorización para conectar
-   la cuenta de Instagram del local y pedir los permisos:
-   - `instagram_business_basic`
-   - `instagram_business_content_publish`
-2. Mientras la app esté en **modo desarrollo** y solo la uses para la
-   cuenta del local (no para cuentas de terceros), no hace falta pasar por
-   App Review.
-3. Al final de ese flujo vas a tener:
-   - El **Instagram Business Account ID** (el `ig_user_id`, no es el @usuario).
-   - Un **access token de larga duración** (dura 60 días).
+## 3. Dar acceso a la cuenta de Instagram
 
-## 4. Cargar la cuenta en el sistema
+1. En la app: **Roles de la app → Roles → Agregar personas → Evaluador de
+   Instagram** → `bicicleteria_2_de_abril`.
+2. Con la sesión del Instagram del local, aceptar la invitación en
+   https://www.instagram.com/accounts/manage_access/ → **Invitaciones de
+   evaluador**.
 
-No se carga por la app web: se hace una sola vez desde el admin de Django,
-para no tener el token dando vueltas por la interfaz.
+Mientras la app esté en modo desarrollo y solo se use con la cuenta del
+local, no hace falta pasar por App Review.
 
-1. Entrá a `/admin/` con un usuario con permisos de staff.
-2. Stories → Cuentas de Instagram → Agregar.
-3. Completá `nombre`, `ig_user_id`, `access_token` y `token_expires_at`
-   (hoy + 60 días).
+## 4. Generar el token
 
-De ahí en adelante, la tarea periódica `refresh_expiring_tokens` (Celery
-beat, corre una vez por día) renueva el token automáticamente cuando le
-quedan menos de 7 días — mientras el servidor esté corriendo. Si el token
-llega a vencer sin renovarse, hay que repetir el paso 3 y volver a cargarlo
-a mano.
+**Casos de uso → Personalizar → API setup with Unified login**:
+
+1. **Crear nueva configuración** (valores por defecto; activo: la cuenta de
+   Instagram del local). La URL de redireccionamiento se puede dejar vacía.
+2. **Generar tokens de acceso** para la cuenta. Copialo y guardalo en un lugar
+   seguro: no lo pegues en chats ni en el repo.
+
+## 5. Guardarlo en el sistema
+
+Desde la carpeta `backend` (en local) o con `dc exec backend ...` en el
+servidor (ver `docs/deploy_oracle.md`):
+
+```bash
+python manage.py conectar_instagram
+```
+
+Pide el token sin mostrarlo, averigua solo el ID de la cuenta de Instagram,
+comprueba que funcione y lo guarda. Si se genera un token nuevo más adelante,
+se vuelve a correr el mismo comando y lo actualiza.
+
+## Para probar publicaciones en local
+
+Meta descarga la imagen de la historia desde internet, así que `localhost` no
+le sirve. En local:
+
+1. Servir solo las imágenes: `.venv/Scripts/python scripts/serve_media.py`
+   (puerto 8001; no expone la API ni la base).
+2. Túnel: `ngrok http 8001`.
+3. En `backend/.env`: `PUBLIC_MEDIA_BASE_URL=https://<url-de-ngrok>/media` y
+   `CELERY_TASK_ALWAYS_EAGER=True`, y reiniciar el backend.
+
+En producción no hace falta nada de esto: Caddy sirve `/media` en el dominio.
 
 ## Límites a tener en cuenta
 
-- 100 publicaciones por API cada 24 horas móviles, contando historias,
-  posts y reels juntos.
-- La API no permite agregar stickers interactivos a las historias
-  (encuestas, links, menciones, música, cuenta regresiva): todo el texto
-  y el contacto van dibujados en la imagen, que es justo lo que hace el
-  Taller de Historias.
-- Las historias vencen a las 24 horas; no hay forma de extenderlas por API.
+- 100 publicaciones por API cada 24 horas móviles (historias, posts y reels
+  juntos).
+- La API no permite stickers interactivos en las historias (encuestas, links,
+  menciones, música): todo va dibujado en la imagen, que es lo que hace el
+  Taller.
+- Las historias vencen a las 24 horas.

@@ -25,7 +25,7 @@ def publicar_post(post_id: int) -> None:
 
     post.estado = StoryPost.Estado.PUBLICANDO
     post.error_mensaje = ""
-    post.save(update_fields=["estado", "error_mensaje"])
+    post.save(update_fields=["estado", "error_mensaje", "actualizado"])
 
     cuenta = post.cuenta
     image_url = post.imagen_url_publica
@@ -37,7 +37,7 @@ def publicar_post(post_id: int) -> None:
     except meta_graph.GraphAPIError as exc:
         post.estado = StoryPost.Estado.ERROR
         post.error_mensaje = str(exc)
-        post.save(update_fields=["estado", "error_mensaje"])
+        post.save(update_fields=["estado", "error_mensaje", "actualizado"])
         logger.error("Error publicando StoryPost %s: %s", post_id, exc)
         return
 
@@ -45,7 +45,7 @@ def publicar_post(post_id: int) -> None:
     post.ig_media_id = media_id
     post.estado = StoryPost.Estado.PUBLICADA
     post.publicado_en = timezone.now()
-    post.save(update_fields=["ig_container_id", "ig_media_id", "estado", "publicado_en"])
+    post.save(update_fields=["ig_container_id", "ig_media_id", "estado", "publicado_en", "actualizado"])
 
 
 @shared_task
@@ -60,10 +60,31 @@ def publish_due_posts() -> None:
         # asi la proxima corrida de beat (o una corrida en paralelo) no la
         # vuelve a encolar mientras el worker todavia no la tomo.
         tomada = StoryPost.objects.filter(pk=post_id, estado=StoryPost.Estado.PROGRAMADA).update(
-            estado=StoryPost.Estado.PUBLICANDO
+            estado=StoryPost.Estado.PUBLICANDO, actualizado=timezone.now()
         )
         if tomada:
             publicar_post.delay(post_id)
+
+
+MINUTOS_PARA_DAR_POR_COLGADA = 15
+
+
+@shared_task
+def marcar_publicaciones_colgadas() -> int:
+    """
+    Tarea periodica: si una historia quedo en PUBLICANDO mucho tiempo (se
+    corto el proceso, se reinicio el servidor, se perdio la tarea en la
+    cola), la pasa a ERROR para que se pueda reintentar desde la app.
+    """
+    limite = timezone.now() - timezone.timedelta(minutes=MINUTOS_PARA_DAR_POR_COLGADA)
+    cantidad = StoryPost.objects.filter(estado=StoryPost.Estado.PUBLICANDO, actualizado__lt=limite).update(
+        estado=StoryPost.Estado.ERROR,
+        error_mensaje="La publicación se interrumpió antes de terminar. Probá publicarla de nuevo.",
+        actualizado=timezone.now(),
+    )
+    if cantidad:
+        logger.warning("Se marcaron %s historias colgadas en PUBLICANDO como ERROR", cantidad)
+    return cantidad
 
 
 @shared_task

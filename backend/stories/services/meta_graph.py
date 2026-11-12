@@ -116,6 +116,20 @@ def publicar_historia(ig_user_id: str, access_token: str, image_url: str) -> tup
     return container_id, media_id
 
 
+def cuentas_instagram_asignadas(access_token: str) -> list[dict]:
+    """
+    Cuentas de Instagram a las que tiene acceso un token de Unified login
+    (token de usuario del sistema). Devuelve [{"id": ..., "username": ...}, ...].
+    """
+    data = _get("me/assigned_instagram_accounts", {"fields": "id,username", "access_token": access_token})
+    return data.get("data", [])
+
+
+def datos_cuenta(ig_user_id: str, access_token: str) -> dict:
+    """Lee id y @usuario de una cuenta: sirve para comprobar que el token funciona con ella."""
+    return _get(ig_user_id, {"fields": "id,username", "access_token": access_token})
+
+
 def renovar_token_larga_duracion(access_token: str) -> dict:
     """
     Renueva un token de larga duracion que todavia no vencio (se puede

@@ -26,14 +26,31 @@ class ApiBase(MediaTemporalMixin, APITestCase):
 class ConfigPermisosTests(SimpleTestCase):
     """El default de permisos sale de DEBUG al cargar settings.py."""
 
-    def _rest_framework_con(self, debug):
+    def _settings_con(self, **variables):
         import config.settings as settings_module
 
-        with mock.patch.dict(os.environ, {"DEBUG": debug}):
+        with mock.patch.dict(os.environ, variables):
             try:
-                return importlib.reload(settings_module).REST_FRAMEWORK
+                return importlib.reload(settings_module)
             finally:
                 importlib.reload(settings_module)
+
+    def _rest_framework_con(self, debug):
+        return self._settings_con(DEBUG=debug, SECRET_KEY="clave-de-test").REST_FRAMEWORK
+
+    def test_en_produccion_sin_secret_key_no_arranca(self):
+        from django.core.exceptions import ImproperlyConfigured
+
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("SECRET_KEY", None)
+            with self.assertRaisesMessage(ImproperlyConfigured, "SECRET_KEY"):
+                self._settings_con(DEBUG="False")
+
+    def test_en_produccion_las_cookies_son_seguras(self):
+        modulo = self._settings_con(DEBUG="False", SECRET_KEY="clave-de-test")
+        self.assertTrue(modulo.SESSION_COOKIE_SECURE)
+        self.assertTrue(modulo.CSRF_COOKIE_SECURE)
+        self.assertEqual(modulo.SECURE_PROXY_SSL_HEADER, ("HTTP_X_FORWARDED_PROTO", "https"))
 
     def test_en_produccion_exige_login(self):
         self.assertEqual(

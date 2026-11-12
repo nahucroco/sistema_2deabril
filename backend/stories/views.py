@@ -39,7 +39,7 @@ class StoryPostViewSet(viewsets.ModelViewSet):
         # si se encolaba antes, un worker rapido podia dejarla PUBLICADA y
         # esta vista la pisaba de vuelta a PUBLICANDO para siempre.
         post.estado = StoryPost.Estado.PUBLICANDO
-        post.save(update_fields=["estado"])
+        post.save(update_fields=["estado", "actualizado"])
         transaction.on_commit(lambda: publicar_post.delay(post.id))
         return Response(self.get_serializer(post).data)
 

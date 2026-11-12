@@ -5,6 +5,7 @@ import PhotoStep from "./steps/PhotoStep";
 import TypeStep from "./steps/TypeStep";
 import TextStep from "./steps/TextStep";
 import SaveStep from "./steps/SaveStep";
+import Login from "./Login";
 
 const INITIAL_STATE = {
   tipo: "usada",
@@ -20,6 +21,22 @@ const INITIAL_STATE = {
 };
 
 export default function App() {
+  // null mientras se consulta; despues {usuario, requiere_login}
+  const [sesion, setSesion] = useState(null);
+
+  useEffect(() => {
+    api
+      .sesion()
+      .then(setSesion)
+      .catch(() => setSesion({ usuario: null, requiere_login: true }));
+  }, []);
+
+  if (!sesion) return null;
+  if (sesion.requiere_login && !sesion.usuario) return <Login onLogin={setSesion} />;
+  return <Taller sesion={sesion} onLogout={setSesion} />;
+}
+
+function Taller({ sesion, onLogout }) {
   const [state, setState] = useState(() => {
     try {
       const guardado = JSON.parse(localStorage.getItem("taller-2deabril") || "{}");
@@ -71,6 +88,11 @@ export default function App() {
             tal cual: solo se le suma el marco, el precio y el contacto.
           </p>
         </div>
+        {sesion.usuario && (
+          <button type="button" className="logout" onClick={() => api.cerrarSesion().then(onLogout)}>
+            Salir
+          </button>
+        )}
       </header>
 
       <div className="bench">

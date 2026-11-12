@@ -83,9 +83,15 @@ class StoryPost(models.Model):
 
     @property
     def imagen_url_publica(self):
-        """URL publica absoluta de la imagen, la que necesita leer Meta."""
+        """
+        URL publica absoluta de la imagen, la que necesita leer Meta.
+
+        PUBLIC_MEDIA_BASE_URL apunta a la carpeta de media en si (por ejemplo
+        https://dominio.com/media), asi en local se puede exponer solo esa
+        carpeta por un tunel sin dejar la API abierta a internet.
+        """
         from django.conf import settings
 
         if not self.imagen:
             return None
-        return f"{settings.PUBLIC_MEDIA_BASE_URL}{self.imagen.url}"
+        return f"{settings.PUBLIC_MEDIA_BASE_URL.rstrip('/')}/{self.imagen.name}"

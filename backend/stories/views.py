@@ -1,6 +1,5 @@
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import InstagramAccount, StoryPost
@@ -18,13 +17,14 @@ class InstagramAccountViewSet(viewsets.ReadOnlyModelViewSet):
 
     queryset = InstagramAccount.objects.filter(activa=True)
     serializer_class = InstagramAccountSerializer
-    permission_classes = [IsAuthenticated]
+    # Sin permission_classes propio: toma el default de settings.REST_FRAMEWORK
+    # (AllowAny en DEBUG para poder probar el front sin loguearse, IsAuthenticated en produccion).
 
 
 class StoryPostViewSet(viewsets.ModelViewSet):
     queryset = StoryPost.objects.all()
     serializer_class = StoryPostSerializer
-    permission_classes = [IsAuthenticated]
+    # Idem: default de settings.REST_FRAMEWORK segun DEBUG.
 
     @action(detail=True, methods=["post"])
     def publicar_ahora(self, request, pk=None):

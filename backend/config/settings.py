@@ -88,8 +88,13 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
+    # En DEBUG permitimos acceso anonimo para poder probar el front sin
+    # loguearse. En produccion (DEBUG=False) queda IsAuthenticated: la
+    # API maneja tokens de Instagram y plata, no se expone sin login.
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
+        "rest_framework.permissions.AllowAny"
+        if DEBUG
+        else "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",

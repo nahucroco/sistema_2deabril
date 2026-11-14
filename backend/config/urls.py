@@ -10,3 +10,6 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# La web publica va al final: es la que atiende la raiz del sitio.
+urlpatterns.append(path("", include("catalogo.urls")))

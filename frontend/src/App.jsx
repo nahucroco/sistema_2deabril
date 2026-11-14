@@ -78,7 +78,7 @@ function Taller({ sesion, onLogout }) {
   return (
     <div className="wrap">
       <header>
-        <img src="/logo.png" alt="Bicicletería 2 de Abril, repuestos y taller" />
+        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Bicicletería 2 de Abril, repuestos y taller" />
         <div>
           <h1>
             Taller de <span>Historias</span>
@@ -88,11 +88,15 @@ function Taller({ sesion, onLogout }) {
             tal cual: solo se le suma el marco, el precio y el contacto.
           </p>
         </div>
-        {sesion.usuario && (
-          <button type="button" className="logout" onClick={() => api.cerrarSesion().then(onLogout)}>
-            Salir
-          </button>
-        )}
+        <nav className="panel-links" aria-label="Panel">
+          <a href="/admin/catalogo/producto/">Productos de la web</a>
+          <a href="/" target="_blank" rel="noopener">Ver la web</a>
+          {sesion.usuario && (
+            <button type="button" className="logout" onClick={() => api.cerrarSesion().then(onLogout)}>
+              Salir
+            </button>
+          )}
+        </nav>
       </header>
 
       <div className="bench">

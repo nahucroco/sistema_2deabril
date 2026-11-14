@@ -1,0 +1,67 @@
+{% extends "catalogo/base.html" %}
+{% block titulo %}Catálogo · Bicicletería 2 de Abril{% endblock %}
+{% block og_titulo %}Catálogo · Bicicletería 2 de Abril{% endblock %}
+{% block contenido %}
+<div class="contenedor pagina">
+  <h1 class="titulo-pagina">Catálogo</h1>
+  <p class="bajada">Todo lo que tenemos en el local. ¿No encontrás lo que buscás? Preguntanos por WhatsApp.</p>
+
+  <form class="filtros" method="get" action="{% url 'catalogo:catalogo' %}">
+    {# Va antes que los botones: si se toca uno, su valor llega despues y es el que cuenta. #}
+    {% if categoria %}<input type="hidden" name="categoria" value="{{ categoria }}">{% endif %}
+    <div class="chips" role="group" aria-label="Categoría">
+      {% for valor, nombre in categorias %}
+      <button class="chip" type="submit" name="categoria" value="{{ valor }}" aria-pressed="{% if valor == categoria %}true{% else %}false{% endif %}">{{ nombre }}</button>
+      {% endfor %}
+    </div>
+    <div class="filtros-campos">
+      <label class="campo">Buscar
+        <input type="search" name="q" value="{{ buscar }}" placeholder="Ej.: R29, casco">
+      </label>
+      {% if rodados %}
+      <label class="campo">Rodado
+        <select name="rodado" data-auto>
+          <option value="">Todos</option>
+          {% for r in rodados %}<option value="{{ r }}"{% if r|stringformat:"d" == rodado %} selected{% endif %}>{{ r }}</option>{% endfor %}
+        </select>
+      </label>
+      {% endif %}
+      <label class="campo">Ordenar
+        <select name="orden" data-auto>
+          {% for valor, nombre in ordenes %}<option value="{{ valor }}"{% if valor == orden %} selected{% endif %}>{{ nombre }}</option>{% endfor %}
+        </select>
+      </label>
+      <button class="boton boton-oscuro boton-chico" type="submit">Filtrar</button>
+    </div>
+  </form>
+
+  <p class="conteo">{{ pagina.paginator.count }} producto{{ pagina.paginator.count|pluralize }}</p>
+
+  {% if pagina.object_list %}
+  <div class="grilla-productos">
+    {% for p in pagina.object_list %}{% include "catalogo/_tarjeta.html" %}{% endfor %}
+  </div>
+  {% else %}
+  <div class="vacio">
+    <p>No encontramos productos con esos filtros.</p>
+    <a class="link-fuerte" href="{% url 'catalogo:catalogo' %}">Ver todo el catálogo</a>
+  </div>
+  {% endif %}
+
+  {% if pagina.has_other_pages %}
+  <nav class="paginas" aria-label="Páginas">
+    {% if pagina.has_previous %}<a class="boton boton-borde boton-chico" href="?{{ filtros }}{% if filtros %}&amp;{% endif %}pagina={{ pagina.previous_page_number }}">← Anterior</a>{% endif %}
+    <span>Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span>
+    {% if pagina.has_next %}<a class="boton boton-borde boton-chico" href="?{{ filtros }}{% if filtros %}&amp;{% endif %}pagina={{ pagina.next_page_number }}">Siguiente →</a>{% endif %}
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  // Con JavaScript, cambiar un desplegable filtra solo (sin JavaScript queda el botón "Filtrar").
+  document.querySelectorAll("select[data-auto]").forEach(function (s) {
+    s.addEventListener("change", function () { s.form.submit(); });
+  });
+</script>
+{% endblock %}

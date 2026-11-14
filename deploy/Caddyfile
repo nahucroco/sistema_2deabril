@@ -7,30 +7,29 @@
 		max_size 20MB
 	}
 
-	handle /api/* {
-		reverse_proxy backend:8000
-	}
-	handle /admin/* {
-		reverse_proxy backend:8000
+	# El Taller de Historias (React compilado con base /panel/).
+	redir /panel /panel/
+	handle_path /panel/* {
+		root * /srv/frontend
+		try_files {path} /index.html
+		file_server
 	}
 
-	# Archivos del admin de Django (collectstatic).
+	# CSS de la web y archivos del admin de Django (collectstatic).
 	handle_path /static/* {
 		root * /srv/static
 		file_server
 	}
 
-	# Imagenes de las historias: Meta las descarga de aca para publicarlas.
+	# Fotos de productos e imagenes de las historias (Meta las descarga de aca).
 	# file_server sin "browse" no lista carpetas.
 	handle /media/* {
 		root * /srv
 		file_server
 	}
 
-	# El Taller (React compilado). Cualquier otra ruta cae en index.html.
+	# Todo lo demas lo atiende Django: la web publica, /api y /admin.
 	handle {
-		root * /srv/frontend
-		try_files {path} /index.html
-		file_server
+		reverse_proxy backend:8000
 	}
 }

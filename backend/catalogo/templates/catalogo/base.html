@@ -1,0 +1,65 @@
+{% load static catalogo_tags %}<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block titulo %}Bicicletería 2 de Abril · Repuestos y taller{% endblock %}</title>
+<meta name="description" content="{% block descripcion %}Bicicletas nuevas y usadas, repuestos, accesorios y taller propio. Consultanos por WhatsApp.{% endblock %}">
+<link rel="canonical" href="{% absoluta request.path %}">
+<meta property="og:site_name" content="Bicicletería 2 de Abril">
+<meta property="og:locale" content="es_AR">
+<meta property="og:type" content="{% block og_tipo %}website{% endblock %}">
+<meta property="og:title" content="{% block og_titulo %}Bicicletería 2 de Abril{% endblock %}">
+<meta property="og:description" content="{% block og_descripcion %}Bicicletas nuevas y usadas, repuestos, accesorios y taller propio.{% endblock %}">
+<meta property="og:url" content="{% absoluta request.path %}">
+<meta property="og:image" content="{% block og_imagen %}{% static 'catalogo/logo.png' as logo %}{% absoluta logo %}{% endblock %}">
+<meta name="theme-color" content="#1C1C1C">
+<link rel="icon" href="{% static 'catalogo/logo.png' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Racing+Sans+One&display=swap">
+<link rel="stylesheet" href="{% static 'catalogo/sitio.css' %}">
+</head>
+<body>
+{% with seccion=request.resolver_match.url_name %}
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+<header class="encabezado">
+  <div class="contenedor encabezado-fila">
+    <a class="marca" href="{% url 'catalogo:inicio' %}">
+      <img src="{% static 'catalogo/logo.png' %}" alt="" width="52" height="52">
+      <span>2 de Abril</span>
+    </a>
+    <nav class="menu" aria-label="Principal">
+      <a href="{% url 'catalogo:inicio' %}"{% if seccion == "inicio" %} aria-current="page"{% endif %}>Inicio</a>
+      <a href="{% url 'catalogo:catalogo' %}"{% if seccion == "catalogo" or seccion == "producto" %} aria-current="page"{% endif %}>Catálogo</a>
+      <a href="{% url 'catalogo:taller' %}"{% if seccion == "taller" %} aria-current="page"{% endif %}>Taller</a>
+      <a href="{% url 'catalogo:inicio' %}#contacto">Dónde estamos</a>
+    </nav>
+    {% if negocio.whatsapp %}
+    <a class="boton boton-whatsapp boton-chico" href="{{ negocio.whatsapp_general }}" target="_blank" rel="noopener">{% include "catalogo/_iconos.html" with icono="whatsapp" %}WhatsApp</a>
+    {% endif %}
+  </div>
+</header>
+{% endwith %}
+
+<main id="contenido">
+{% block contenido %}{% endblock %}
+</main>
+
+<footer class="pie">
+  <div class="contenedor pie-fila">
+    <div class="pie-marca">
+      <img src="{% static 'catalogo/logo.png' %}" alt="" width="44" height="44" loading="lazy">
+      <span>Bicicletería 2 de Abril · Repuestos y taller</span>
+    </div>
+    <nav class="pie-menu" aria-label="Pie de página">
+      <a href="{% url 'catalogo:catalogo' %}">Catálogo</a>
+      <a href="{% url 'catalogo:taller' %}">Taller</a>
+      <a href="{% url 'catalogo:inicio' %}#contacto">Dónde estamos</a>
+      {% if negocio.link_instagram %}<a href="{{ negocio.link_instagram }}" target="_blank" rel="noopener">Instagram</a>{% endif %}
+    </nav>
+  </div>
+</footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>

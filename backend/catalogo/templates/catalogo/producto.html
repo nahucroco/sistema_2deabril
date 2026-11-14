@@ -1,0 +1,107 @@
+{% extends "catalogo/base.html" %}
+{% load catalogo_tags %}
+{% block titulo %}{{ producto.nombre }} · Bicicletería 2 de Abril{% endblock %}
+{% block descripcion %}{{ producto.detalle|default:producto.nombre }} — {{ producto.precio_texto }}{% endblock %}
+{% block og_tipo %}product{% endblock %}
+{% block og_titulo %}{{ producto.nombre }} — {{ producto.precio_texto }}{% endblock %}
+{% block og_descripcion %}{{ producto.detalle|default:"Consultanos por WhatsApp." }}{% endblock %}
+{% block og_imagen %}{% if fotos %}{% absoluta fotos.0.imagen.url %}{% else %}{{ block.super }}{% endif %}{% endblock %}
+{% block contenido %}
+<div class="contenedor pagina">
+  <nav class="ruta" aria-label="Ruta">
+    <a href="{% url 'catalogo:catalogo' %}">Catálogo</a><span aria-hidden="true">/</span>
+    <a href="{% url 'catalogo:catalogo' %}?categoria={{ producto.categoria }}">{{ producto.get_categoria_display }}</a><span aria-hidden="true">/</span>
+    <span aria-current="page">{{ producto.nombre }}</span>
+  </nav>
+
+  <div class="ficha">
+    <div class="galeria">
+      <div class="galeria-principal">
+        {% if fotos %}
+        <img id="foto-principal" src="{{ fotos.0.imagen.url }}" alt="{{ producto.nombre }}">
+        {% elif producto.categoria == "nueva" or producto.categoria == "usada" %}
+        {% include "catalogo/_iconos.html" with icono="bici" %}
+        {% else %}
+        {% include "catalogo/_iconos.html" with icono="caja" %}
+        {% endif %}
+      </div>
+      {% if fotos|length > 1 %}
+      <div class="miniaturas" role="group" aria-label="Fotos">
+        {% for f in fotos %}
+        <button type="button" class="miniatura" data-foto="{{ f.imagen.url }}" aria-label="Ver foto {{ forloop.counter }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">
+          <img src="{{ f.imagen.url }}" alt="" loading="lazy">
+        </button>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="ficha-datos">
+      <div class="etiquetas">
+        {% with etiqueta=producto.etiqueta %}{% if etiqueta.0 %}<span class="etiqueta etiqueta-{{ etiqueta.1 }}">{{ etiqueta.0 }}</span>{% endif %}{% endwith %}
+        <span class="estado estado-{{ producto.estado }}">{% if producto.estado == "disponible" %}{% include "catalogo/_iconos.html" with icono="check" %}{% endif %}{{ producto.get_estado_display }}</span>
+      </div>
+      <h1 class="titulo-producto">{{ producto.nombre }}</h1>
+      <div class="ficha-precio">
+        <span class="precio-grande">{{ producto.precio_texto }}</span>
+        {% if producto.precio_anterior_texto %}<span class="precio-antes"><span class="visualmente-oculto">Antes: </span>{{ producto.precio_anterior_texto }}</span>{% endif %}
+      </div>
+      {% if producto.descripcion %}<div class="descripcion">{{ producto.descripcion|linebreaks }}</div>{% elif producto.detalle %}<p class="descripcion">{{ producto.detalle }}</p>{% endif %}
+
+      {% if producto.lista_caracteristicas %}
+      <dl class="caracteristicas">
+        {% for clave, valor in producto.lista_caracteristicas %}
+        <div>{% if clave %}<dt>{{ clave }}</dt>{% endif %}<dd>{{ valor }}</dd></div>
+        {% endfor %}
+      </dl>
+      {% endif %}
+
+      {% if producto.estado == "vendido" %}
+      <p class="aviso">Este producto ya se vendió. Mirá otros parecidos en el <a href="{% url 'catalogo:catalogo' %}?categoria={{ producto.categoria }}">catálogo</a> o preguntanos si nos entra otro.</p>
+      {% endif %}
+
+      <div class="acciones">
+        {% if whatsapp_producto %}
+        <a class="boton boton-whatsapp boton-ancho" href="{{ whatsapp_producto }}" target="_blank" rel="noopener">{% include "catalogo/_iconos.html" with icono="whatsapp" %}Consultar por WhatsApp</a>
+        {% endif %}
+        {% if producto.estado != "vendido" %}
+        {% if producto.link_mercadolibre %}
+        <a class="boton boton-borde boton-ancho" href="{{ producto.link_mercadolibre }}" target="_blank" rel="noopener">Ver en Mercado Libre{% include "catalogo/_iconos.html" with icono="externo" %}</a>
+        {% endif %}
+        {% if producto.link_marketplace %}
+        <a class="boton boton-borde boton-ancho" href="{{ producto.link_marketplace }}" target="_blank" rel="noopener">Ver en Marketplace{% include "catalogo/_iconos.html" with icono="externo" %}</a>
+        {% endif %}
+        {% endif %}
+      </div>
+
+      <div class="nota">
+        {% include "catalogo/_iconos.html" with icono="info" %}
+        <span>No cobramos por la web: la venta se cierra en el local{% if producto.link_mercadolibre or producto.link_marketplace %} o por la publicación{% endif %}. Escribinos y coordinamos.</span>
+      </div>
+    </div>
+  </div>
+
+  {% if relacionados %}
+  <section class="seccion-relacionados">
+    <h2 class="titulo-seccion">También te puede interesar</h2>
+    <div class="grilla-productos">
+      {% for p in relacionados %}{% include "catalogo/_tarjeta.html" %}{% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  (function () {
+    var principal = document.getElementById("foto-principal");
+    var botones = document.querySelectorAll(".miniatura");
+    botones.forEach(function (b) {
+      b.addEventListener("click", function () {
+        principal.src = b.dataset.foto;
+        botones.forEach(function (o) { o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
+      });
+    });
+  })();
+</script>
+{% endblock %}

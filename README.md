@@ -19,7 +19,8 @@ realmente le haga falta (ver "Ideas para después" más abajo).
 backend/    Django + DRF + Celery: modelos, API REST, publicación a
             Instagram vía Graph API, tareas programadas (publicar
             historias programadas, renovar el token cada 60 días).
-frontend/   React (Vite): el flujo de 4 pasos (foto → tipo de
+            La app "catalogo" es la web pública (templates de Django).
+frontend/   React (Vite), en /panel/: el flujo de 4 pasos (foto → tipo de
             publicación → texto → guardar/publicar), con vista previa
             9:16 en <canvas> que reusa el diseño validado en el
             prototipo.
@@ -60,8 +61,18 @@ npm install
 npm run dev
 ```
 
-Abre en `http://localhost:5173`. En desarrollo, Vite proxea `/api` hacia
+El Taller de Historias abre en `http://localhost:5173/panel/`. En desarrollo,
+Vite proxea `/api`, `/admin`, `/static` y `/media` hacia
 `http://localhost:8000` (el backend de Django).
+
+### Web pública
+
+La sirve Django: `http://localhost:8000/` (inicio), `/catalogo/`,
+`/producto/<slug>/` y `/taller/`. Los productos, los servicios del taller y
+los datos de contacto (WhatsApp, dirección, horarios) se cargan desde
+`/admin/`, en la sección "Web pública". La web no cobra: cada producto
+lleva a WhatsApp con el mensaje armado y, si tiene, a su publicación de
+Mercado Libre o Marketplace.
 
 ### Produccion
 
@@ -84,7 +95,10 @@ docker compose up --build
 - [x] Cuenta real del local conectada (Unified login, ver `docs/instagram_setup.md`)
       y primera historia publicada por API.
 - [x] Login para usar el Taller en produccion.
-- [ ] Deploy en Oracle Cloud (ver `docs/deploy_oracle.md`).
+- [x] Deploy en una VM gratis (Google Cloud e2-micro; guía en `docs/deploy_oracle.md`).
+- [x] Web pública: inicio, catálogo con filtros, ficha de producto con
+      WhatsApp y Mercado Libre, página del taller. Se administra desde `/admin/`.
+- [ ] Sección de productos dentro del panel y "crear historia desde un producto".
 - [ ] Posts de feed y Reels (hoy el foco es historias).
 - [ ] Bandeja de comentarios/mensajes de Instagram con respuestas sugeridas.
 

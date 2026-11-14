@@ -1,0 +1,49 @@
+{% extends "catalogo/base.html" %}
+{% block titulo %}Taller de bicicletas · Bicicletería 2 de Abril{% endblock %}
+{% block descripcion %}Service completo, frenos, cambios, centrado de ruedas y más. Pedí turno por WhatsApp.{% endblock %}
+{% block og_titulo %}Taller · Bicicletería 2 de Abril{% endblock %}
+{% block og_descripcion %}Service completo, frenos, cambios, centrado de ruedas y más. Pedí turno por WhatsApp.{% endblock %}
+{% block contenido %}
+<section class="portada portada-azul">
+  <div class="contenedor portada-fila">
+    <div class="portada-texto">
+      <span class="sobretitulo sobretitulo-claro">Taller propio</span>
+      <h1 class="titulo-portada">Dejá tu bici como nueva</h1>
+      <p class="portada-bajada">Arreglamos bicis de todo tipo y marca. Pedí turno por WhatsApp y te avisamos cuando está lista.</p>
+      {% if negocio.whatsapp %}
+      <div class="botones">
+        <a class="boton boton-claro" href="{{ negocio.whatsapp_taller }}" target="_blank" rel="noopener">{% include "catalogo/_iconos.html" with icono="whatsapp" %}Pedir turno por WhatsApp</a>
+      </div>
+      {% endif %}
+    </div>
+    <div class="portada-foto portada-foto-azul">
+      {% include "catalogo/_iconos.html" with icono="llave" %}
+    </div>
+  </div>
+</section>
+
+<div class="contenedor seccion">
+  {% if servicios %}
+  <h2 class="titulo-seccion">Servicios y precios</h2>
+  <p class="bajada">Precios orientativos de mano de obra. Los repuestos se cobran aparte y te los consultamos antes de cambiar nada.</p>
+  <div class="grilla-servicios">
+    {% for s in servicios %}
+    <div class="servicio">
+      <div class="servicio-cabecera">
+        <h3 class="servicio-nombre">{{ s.nombre }}</h3>
+        {% if s.precio %}<span class="servicio-precio">{{ s.precio }}</span>{% endif %}
+      </div>
+      {% if s.detalle %}<p class="servicio-detalle">{{ s.detalle }}</p>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <h2 class="titulo-seccion titulo-separado">Cómo funciona</h2>
+  <ol class="pasos">
+    <li><span class="paso-numero" aria-hidden="true">1</span><span class="paso-titulo">Pedí turno</span><span class="paso-texto">Escribinos por WhatsApp contando qué le pasa a la bici.</span></li>
+    <li><span class="paso-numero" aria-hidden="true">2</span><span class="paso-titulo">Traela al local</span><span class="paso-texto">La revisamos y te pasamos el presupuesto antes de arrancar.</span></li>
+    <li><span class="paso-numero" aria-hidden="true">3</span><span class="paso-titulo">Te avisamos</span><span class="paso-texto">Cuando está lista te mandamos un mensaje para que la retires.</span></li>
+  </ol>
+</div>
+{% endblock %}

@@ -17,7 +17,7 @@ export default function StoryCanvas({ state, onPan, showSafeZones, canvasRef: ex
       logoRef.current = img;
       redraw();
     };
-    img.src = "/logo.png";
+    img.src = `${import.meta.env.BASE_URL}logo.png`;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

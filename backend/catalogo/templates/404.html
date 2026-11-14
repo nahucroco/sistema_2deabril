@@ -1,0 +1,12 @@
+{% extends "catalogo/base.html" %}
+{% block titulo %}Página no encontrada · Bicicletería 2 de Abril{% endblock %}
+{% block contenido %}
+<div class="contenedor pagina vacio-pagina">
+  <h1 class="titulo-pagina">No encontramos esta página</h1>
+  <p class="bajada">Puede que el producto ya no esté publicado o que el link tenga un error.</p>
+  <div class="botones">
+    <a class="boton boton-oscuro" href="{% url 'catalogo:catalogo' %}">Ver el catálogo</a>
+    <a class="boton boton-borde" href="{% url 'catalogo:inicio' %}">Ir al inicio</a>
+  </div>
+</div>
+{% endblock %}

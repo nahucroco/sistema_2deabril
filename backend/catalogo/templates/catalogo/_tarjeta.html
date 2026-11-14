@@ -1,0 +1,23 @@
+{% with etiqueta=p.etiqueta foto=p.foto_principal %}
+<a class="tarjeta" href="{{ p.get_absolute_url }}">
+  <div class="tarjeta-foto">
+    {% if foto %}
+    <img src="{{ foto.imagen.url }}" alt="" loading="lazy">
+    {% elif p.categoria == "nueva" or p.categoria == "usada" %}
+    {% include "catalogo/_iconos.html" with icono="bici" %}
+    {% else %}
+    {% include "catalogo/_iconos.html" with icono="caja" %}
+    {% endif %}
+    {% if etiqueta.0 %}<span class="etiqueta etiqueta-{{ etiqueta.1 }}">{{ etiqueta.0 }}</span>{% endif %}
+    {% if p.estado == "reservado" %}<span class="etiqueta etiqueta-reservado">Reservado</span>{% endif %}
+  </div>
+  <div class="tarjeta-cuerpo">
+    <span class="tarjeta-nombre">{{ p.nombre }}</span>
+    {% if p.detalle %}<span class="tarjeta-detalle">{{ p.detalle }}</span>{% endif %}
+    <div class="tarjeta-precio">
+      <span class="precio">{{ p.precio_texto }}</span>
+      {% if p.precio_anterior_texto %}<span class="precio-antes"><span class="visualmente-oculto">Antes: </span>{{ p.precio_anterior_texto }}</span>{% endif %}
+    </div>
+  </div>
+</a>
+{% endwith %}

@@ -23,7 +23,7 @@ export default function Login({ onLogin }) {
   return (
     <div className="wrap login">
       <header>
-        <img src="/logo.png" alt="Bicicletería 2 de Abril, repuestos y taller" />
+        <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Bicicletería 2 de Abril, repuestos y taller" />
         <div>
           <h1>
             Taller de <span>Historias</span>

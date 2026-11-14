@@ -1,0 +1,106 @@
+{% extends "catalogo/base.html" %}
+{% block contenido %}
+<section class="portada">
+  <div class="contenedor portada-fila">
+    <div class="portada-texto">
+      <span class="sobretitulo sobretitulo-cobre">Bicicletería · Repuestos y taller</span>
+      <h1 class="titulo-portada">Tu próxima bici te está esperando</h1>
+      <p class="portada-bajada">Bicicletas nuevas y usadas, repuestos, accesorios y taller propio. Mirá lo que tenemos y consultanos por WhatsApp: te respondemos enseguida.</p>
+      <div class="botones">
+        <a class="boton boton-cobre" href="{% url 'catalogo:catalogo' %}">Ver catálogo</a>
+        {% if negocio.whatsapp %}
+        <a class="boton boton-whatsapp" href="{{ negocio.whatsapp_general }}" target="_blank" rel="noopener">{% include "catalogo/_iconos.html" with icono="whatsapp" %}Escribinos por WhatsApp</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="portada-foto">
+      {% with foto=destacados.0.foto_principal %}
+      {% if foto %}
+      <img src="{{ foto.imagen.url }}" alt="{{ destacados.0.nombre }}">
+      {% else %}
+      {% include "catalogo/_iconos.html" with icono="bici" %}
+      {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+</section>
+
+<section class="contenedor seccion">
+  <h2 class="titulo-seccion">¿Qué estás buscando?</h2>
+  <div class="grilla-categorias">
+    <a class="categoria categoria-azul" href="{% url 'catalogo:catalogo' %}?categoria=nueva">
+      {% include "catalogo/_iconos.html" with icono="bici" %}
+      <span class="categoria-nombre">Bicicletas nuevas</span>
+      <span class="categoria-detalle">Mountain, urbanas, de ruta e infantiles</span>
+    </a>
+    <a class="categoria categoria-oscura" href="{% url 'catalogo:catalogo' %}?categoria=usada">
+      {% include "catalogo/_iconos.html" with icono="usadas" %}
+      <span class="categoria-nombre">Usadas revisadas</span>
+      <span class="categoria-detalle">Pasan por el taller antes de salir a la venta</span>
+    </a>
+    <a class="categoria categoria-cobre" href="{% url 'catalogo:catalogo' %}?categoria=repuesto">
+      {% include "catalogo/_iconos.html" with icono="repuestos" %}
+      <span class="categoria-nombre">Repuestos y accesorios</span>
+      <span class="categoria-detalle">Cubiertas, cámaras, cascos, luces y más</span>
+    </a>
+    <a class="categoria categoria-clara" href="{% url 'catalogo:taller' %}">
+      {% include "catalogo/_iconos.html" with icono="llave" %}
+      <span class="categoria-nombre">Taller</span>
+      <span class="categoria-detalle">Service, frenos, cambios y ruedas</span>
+    </a>
+  </div>
+</section>
+
+{% if destacados %}
+<section class="contenedor seccion">
+  <div class="seccion-cabecera">
+    <h2 class="titulo-seccion">Destacados</h2>
+    <a class="link-fuerte" href="{% url 'catalogo:catalogo' %}">Ver todo el catálogo →</a>
+  </div>
+  <div class="grilla-productos">
+    {% for p in destacados %}{% include "catalogo/_tarjeta.html" %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="contenedor seccion">
+  <h2 class="titulo-seccion">Cómo comprar</h2>
+  <p class="bajada">No cobramos por la web: lo hablamos por WhatsApp y lo cerrás en el local o por Mercado Libre.</p>
+  <ol class="pasos">
+    <li><span class="paso-numero" aria-hidden="true">1</span><span class="paso-titulo">Elegí en el catálogo</span><span class="paso-texto">Fotos, precio y si está disponible, todo actualizado.</span></li>
+    <li><span class="paso-numero" aria-hidden="true">2</span><span class="paso-titulo">Consultanos por WhatsApp</span><span class="paso-texto">El botón de cada producto ya manda el mensaje con lo que elegiste.</span></li>
+    <li><span class="paso-numero" aria-hidden="true">3</span><span class="paso-titulo">Retirala o comprá online</span><span class="paso-texto">Pasá por el local, o comprala en nuestra publicación de Mercado Libre.</span></li>
+  </ol>
+</section>
+
+<section class="franja-azul">
+  <div class="contenedor franja-fila">
+    <div>
+      <h2 class="titulo-seccion">¿Tu bici necesita un service?</h2>
+      <p class="franja-texto">Arreglamos todo tipo de bicis: service completo, frenos, cambios, ruedas y más.</p>
+    </div>
+    <a class="boton boton-claro" href="{% url 'catalogo:taller' %}">Ver servicios del taller</a>
+  </div>
+</section>
+
+<section id="contacto" class="contenedor seccion contacto">
+  <div class="contacto-datos">
+    <h2 class="titulo-seccion">Dónde estamos</h2>
+    {% if negocio.direccion %}
+    <div class="dato">{% include "catalogo/_iconos.html" with icono="pin" %}<div><span class="dato-titulo">Dirección</span><span>{{ negocio.direccion }}</span>{% if negocio.link_mapa %}<a href="{{ negocio.link_mapa }}" target="_blank" rel="noopener">Cómo llegar</a>{% endif %}</div></div>
+    {% endif %}
+    {% if negocio.lineas_horarios %}
+    <div class="dato">{% include "catalogo/_iconos.html" with icono="reloj" %}<div><span class="dato-titulo">Horarios</span>{% for linea in negocio.lineas_horarios %}<span>{{ linea }}</span>{% endfor %}</div></div>
+    {% endif %}
+    {% if negocio.whatsapp %}
+    <div class="dato">{% include "catalogo/_iconos.html" with icono="whatsapp" %}<div><span class="dato-titulo">WhatsApp</span><a href="{{ negocio.whatsapp_general }}" target="_blank" rel="noopener">+{{ negocio.whatsapp }}</a></div></div>
+    {% endif %}
+    {% if negocio.instagram %}
+    <div class="dato">{% include "catalogo/_iconos.html" with icono="instagram" %}<div><span class="dato-titulo">Instagram</span><a href="{{ negocio.link_instagram }}" target="_blank" rel="noopener">@{{ negocio.instagram }}</a></div></div>
+    {% endif %}
+  </div>
+  {% if negocio.mapa_embebido %}
+  <iframe class="mapa" src="{{ negocio.mapa_embebido }}" title="Mapa con la ubicación del local" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  {% endif %}
+</section>
+{% endblock %}

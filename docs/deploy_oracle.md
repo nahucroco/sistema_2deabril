@@ -3,10 +3,10 @@
 Todo corre en una sola máquina virtual gratis, con Docker Compose:
 
 ```
-Internet ──HTTPS──> Caddy ──┬── /api, /admin ──> Django (gunicorn) ──> Postgres
-                            ├── /media ────────> imágenes (Meta las descarga de acá)
-                            ├── /static ───────> archivos del admin
-                            └── resto ─────────> el Taller (React compilado)
+Internet ──HTTPS──> Caddy ──┬── /panel ────────> el Taller de Historias (React compilado)
+                            ├── /media ────────> fotos (Meta descarga las historias de acá)
+                            ├── /static ───────> CSS de la web y archivos del admin
+                            └── resto ─────────> Django (gunicorn): web pública, /api, /admin ──> Postgres
                  "tareas": cada 5 min publica las programadas y destraba las colgadas
 ```
 
@@ -136,7 +136,7 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod ps
 docker compose -f docker-compose.prod.yml --env-file .env.prod logs -f caddy backend
 ```
 
-Abrí `https://TU_DOMINIO` en el navegador: tiene que aparecer la pantalla
+Abrí `https://TU_DOMINIO/panel/` en el navegador: tiene que aparecer la pantalla
 de login con el candadito de HTTPS. Si Caddy no consigue el certificado,
 revisá que DuckDNS apunte a la IP correcta y que los puertos 80/443 estén
 abiertos (paso 3).
@@ -162,7 +162,12 @@ oculto, ver `docs/instagram_setup.md`):
 dc exec backend python manage.py conectar_instagram
 ```
 
-Listo: entrá a `https://TU_DOMINIO`, logueate y publicá una historia.
+Listo:
+
+- `https://TU_DOMINIO` es la web pública para los clientes.
+- `https://TU_DOMINIO/panel/` es el Taller de Historias (pide login).
+- `https://TU_DOMINIO/admin/` → "Web pública": productos, servicios del taller
+  y datos del negocio (WhatsApp, dirección, horarios).
 
 ## Mantenimiento
 

@@ -1,0 +1,297 @@
+/* Web publica de la Bicicleteria 2 de Abril. Colores del manual de marca (ver frontend/src/brand.js). */
+:root {
+  --oscuro: #1c1c1c;
+  --claro: #fcfcfc;
+  --blanco: #ffffff;
+  --azul: #2f5d8c;
+  --azul-hondo: #1f4469;
+  --azul-suave: #dce6f0;
+  --cobre: #c48d50;
+  --cobre-texto: #a86f31;
+  --verde: #177245;
+  --gris-fondo: #eef1f4;
+  --gris-panel: #f3f5f7;
+  --gris-linea: #e1e3e6;
+  --gris-borde: #c9ccd1;
+  --texto-suave: #5b6067;
+  --texto-medio: #3d4146;
+  --titulos: "Racing Sans One", "Arial Black", system-ui, sans-serif;
+  --cuerpo: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --radio: 16px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--claro);
+  color: var(--oscuro);
+  font-family: var(--cuerpo);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+img { max-width: 100%; display: block; }
+a { color: var(--azul); }
+a:hover { color: var(--azul-hondo); }
+:focus-visible { outline: 3px solid var(--cobre); outline-offset: 2px; }
+h1, h2, h3 { margin: 0; }
+
+.contenedor {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (min-width: 720px) {
+  .contenedor { padding-left: 24px; padding-right: 24px; }
+}
+
+.visualmente-oculto {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+.saltar {
+  position: absolute; left: 8px; top: -60px; z-index: 10;
+  background: var(--oscuro); color: var(--blanco); padding: 10px 16px; border-radius: 8px;
+}
+.saltar:focus { top: 8px; color: var(--blanco); }
+
+/* Iconos */
+.icono { width: 18px; height: 18px; flex-shrink: 0; }
+.icono-chico { width: 14px; height: 14px; flex-shrink: 0; }
+.icono-dato { width: 22px; height: 22px; flex-shrink: 0; color: var(--azul); margin-top: 2px; }
+.icono-grande { width: 32px; height: 32px; }
+.icono-bici { width: 96px; height: 60px; }
+
+/* Botones */
+.botones { display: flex; flex-wrap: wrap; gap: 12px; }
+.boton {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 12px 24px; border-radius: 999px; border: 0;
+  font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
+}
+.boton-chico { min-height: 44px; padding: 10px 18px; font-size: 15px; font-weight: 600; }
+.boton-ancho { width: 100%; border-radius: 14px; min-height: 54px; font-size: 17px; }
+.boton-whatsapp, .boton-whatsapp:hover { background: var(--verde); color: var(--blanco); }
+.boton-whatsapp:hover { background: #125c37; }
+.boton-cobre, .boton-cobre:hover { background: var(--cobre); color: var(--oscuro); }
+.boton-cobre:hover { background: #b57d40; }
+.boton-claro, .boton-claro:hover { background: var(--claro); color: var(--azul-hondo); }
+.boton-oscuro, .boton-oscuro:hover { background: var(--oscuro); color: var(--blanco); }
+.boton-borde, .boton-borde:hover { background: var(--blanco); color: var(--oscuro); border: 1.5px solid var(--oscuro); }
+.boton-borde:hover { background: var(--gris-panel); }
+.link-fuerte { font-weight: 600; text-decoration: none; padding: 10px 0; }
+
+/* Encabezado */
+.encabezado { background: var(--claro); border-bottom: 1px solid var(--gris-linea); }
+.encabezado-fila { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 28px; padding-top: 10px; padding-bottom: 10px; }
+.marca { display: flex; align-items: center; gap: 10px; color: var(--oscuro); text-decoration: none; margin-right: auto; }
+.marca:hover { color: var(--oscuro); }
+.marca img { width: 48px; height: 48px; }
+.marca span { font-family: var(--titulos); font-size: 24px; }
+.menu { display: flex; flex-wrap: wrap; gap: 0 22px; font-weight: 500; font-size: 15px; order: 3; width: 100%; }
+.menu a { color: var(--oscuro); text-decoration: none; padding: 10px 0; border-bottom: 2px solid transparent; }
+.menu a[aria-current="page"] { color: var(--azul); border-bottom-color: var(--azul); }
+@media (min-width: 860px) {
+  .marca { margin-right: 0; }
+  .menu { order: 0; width: auto; flex-grow: 1; }
+}
+
+/* Portada */
+.portada { background: var(--oscuro); color: var(--claro); }
+.portada-azul { background: var(--azul); }
+.portada-fila { display: flex; flex-wrap: wrap; align-items: center; gap: 40px; padding-top: 56px; padding-bottom: 56px; }
+@media (min-width: 720px) { .portada-fila { padding-top: 72px; padding-bottom: 72px; gap: 48px; } }
+.portada-texto { flex: 1 1 400px; display: flex; flex-direction: column; gap: 20px; }
+.sobretitulo { font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; font-size: 13px; }
+.sobretitulo-cobre { color: var(--cobre); }
+.sobretitulo-claro { color: #f2d3ae; }
+.titulo-portada { font-family: var(--titulos); font-weight: 400; font-size: clamp(40px, 6vw, 72px); line-height: 1.02; }
+.portada-bajada { margin: 0; font-size: 18px; color: #d5d8dc; max-width: 520px; }
+.portada-azul .portada-bajada { color: var(--azul-suave); }
+.portada-foto {
+  flex: 1 1 340px; aspect-ratio: 5 / 4; border-radius: 20px; overflow: hidden;
+  background: #2a2b2e; color: #a6abb2; display: flex; align-items: center; justify-content: center;
+}
+.portada-foto img { width: 100%; height: 100%; object-fit: cover; }
+.portada-foto .icono-bici { width: 160px; height: 100px; }
+.portada-foto-azul { background: #264d75; color: #c9d8e8; }
+.portada-foto-azul .icono-grande { width: 72px; height: 72px; stroke-width: 1.3; }
+
+/* Secciones */
+.seccion { padding-top: 56px; padding-bottom: 8px; }
+.seccion:last-child { padding-bottom: 64px; }
+.pagina { padding-top: 32px; padding-bottom: 72px; }
+.titulo-seccion { font-family: var(--titulos); font-weight: 400; font-size: clamp(28px, 4vw, 36px); line-height: 1.1; margin-bottom: 20px; }
+.titulo-separado { margin-top: 56px; }
+.titulo-pagina { font-family: var(--titulos); font-weight: 400; font-size: clamp(36px, 5vw, 52px); line-height: 1.05; margin-bottom: 6px; }
+.bajada { margin: -12px 0 28px; color: var(--texto-suave); }
+.titulo-pagina + .bajada { margin-top: 0; }
+.seccion-cabecera { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 24px; margin-bottom: 4px; }
+
+/* Categorias del inicio */
+.grilla-categorias { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.categoria {
+  display: flex; flex-direction: column; gap: 6px; min-height: 150px; padding: 24px;
+  border-radius: var(--radio); text-decoration: none;
+}
+.categoria .icono-bici { width: 56px; height: 35px; stroke-width: 2.4; }
+.categoria-nombre { font-weight: 700; font-size: 19px; margin-top: auto; }
+.categoria-detalle { font-size: 14px; }
+.categoria-azul, .categoria-azul:hover { background: var(--azul); color: var(--blanco); }
+.categoria-azul .categoria-detalle { color: var(--azul-suave); }
+.categoria-oscura, .categoria-oscura:hover { background: var(--oscuro); color: var(--blanco); }
+.categoria-oscura .categoria-detalle { color: var(--gris-borde); }
+.categoria-cobre, .categoria-cobre:hover { background: var(--cobre); color: var(--oscuro); }
+.categoria-cobre .categoria-detalle { color: #2b2116; }
+.categoria-clara, .categoria-clara:hover { background: var(--gris-fondo); color: var(--oscuro); }
+.categoria-clara .categoria-detalle { color: var(--texto-suave); }
+.categoria:hover { filter: brightness(1.06); }
+
+/* Tarjetas de producto */
+.grilla-productos { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+@media (max-width: 540px) {
+  .grilla-productos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .tarjeta-cuerpo { padding: 12px !important; }
+  .tarjeta-nombre { font-size: 15px !important; }
+  .tarjeta-detalle { display: none !important; }
+  .precio { font-size: 18px !important; }
+}
+.tarjeta {
+  display: flex; flex-direction: column; overflow: hidden; text-decoration: none; color: var(--oscuro);
+  background: var(--blanco); border: 1px solid var(--gris-linea); border-radius: var(--radio);
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.tarjeta:hover { color: var(--oscuro); box-shadow: 0 6px 20px rgba(28, 28, 28, 0.1); transform: translateY(-2px); }
+.tarjeta-foto {
+  position: relative; aspect-ratio: 4 / 3; background: var(--gris-fondo); color: #8a9098;
+  display: flex; align-items: center; justify-content: center;
+}
+.tarjeta-foto img { width: 100%; height: 100%; object-fit: cover; }
+.tarjeta-foto .etiqueta { position: absolute; top: 10px; left: 10px; }
+.tarjeta-foto .etiqueta-reservado { left: auto; right: 10px; }
+.tarjeta-cuerpo { padding: 16px; display: flex; flex-direction: column; gap: 4px; flex-grow: 1; }
+.tarjeta-nombre { font-weight: 600; font-size: 16px; }
+.tarjeta-detalle { font-size: 14px; color: var(--texto-suave); }
+.tarjeta-precio { margin-top: auto; padding-top: 8px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; }
+.precio { font-size: 21px; font-weight: 700; }
+.precio-antes { text-decoration: line-through; color: var(--texto-suave); font-size: 14px; }
+
+.etiqueta { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.etiqueta-nueva { background: var(--azul); color: var(--blanco); }
+.etiqueta-usada { background: var(--oscuro); color: var(--blanco); }
+.etiqueta-oferta { background: var(--cobre); color: var(--oscuro); }
+.etiqueta-neutra { background: var(--blanco); color: var(--oscuro); border: 1px solid var(--gris-borde); }
+.etiqueta-reservado { background: #fff3d6; color: #6b4a00; }
+
+/* Como comprar / pasos */
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+.pasos li { display: flex; flex-direction: column; gap: 8px; padding: 24px; border: 1px solid var(--gris-linea); border-radius: var(--radio); }
+.paso-numero { font-family: var(--titulos); font-size: 40px; color: var(--cobre-texto); line-height: 1; }
+.paso-titulo { font-weight: 700; font-size: 18px; }
+.paso-texto { color: var(--texto-suave); font-size: 15px; }
+
+/* Franja del taller */
+.franja-azul { background: var(--azul); color: var(--blanco); margin-top: 56px; }
+.franja-fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; padding-top: 48px; padding-bottom: 48px; }
+.franja-azul .titulo-seccion { margin-bottom: 8px; }
+.franja-texto { margin: 0; font-size: 17px; color: var(--azul-suave); }
+
+/* Contacto */
+.contacto { display: flex; flex-wrap: wrap; gap: 32px; }
+.contacto-datos { flex: 1 1 340px; display: flex; flex-direction: column; gap: 20px; }
+.dato { display: flex; gap: 14px; align-items: flex-start; }
+.dato div { display: flex; flex-direction: column; }
+.dato-titulo { font-weight: 600; }
+.dato span:not(.dato-titulo) { color: var(--texto-suave); }
+.mapa { flex: 1.4 1 420px; min-height: 340px; border: 0; border-radius: 20px; background: var(--gris-fondo); }
+
+/* Catalogo */
+.filtros { display: flex; flex-direction: column; gap: 16px; padding-bottom: 20px; border-bottom: 1px solid var(--gris-linea); margin-bottom: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font: inherit; font-size: 15px; font-weight: 600; min-height: 44px; padding: 10px 18px;
+  border-radius: 999px; cursor: pointer; background: var(--blanco); color: var(--oscuro); border: 1px solid var(--gris-borde);
+}
+.chip[aria-pressed="true"] { background: var(--oscuro); color: var(--blanco); border-color: var(--oscuro); }
+.filtros-campos { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.campo { display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; color: var(--texto-suave); }
+.campo:first-child { flex: 1 1 220px; }
+.campo input, .campo select {
+  font: inherit; font-size: 15px; font-weight: 400; color: var(--oscuro); min-height: 44px; padding: 10px 12px;
+  border: 1px solid var(--gris-borde); border-radius: 10px; background: var(--blanco); width: 100%;
+}
+.conteo { margin: 0 0 16px; color: var(--texto-suave); font-size: 14px; }
+.vacio { padding: 48px 0; text-align: center; color: var(--texto-suave); }
+.paginas { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 16px; margin-top: 40px; color: var(--texto-suave); }
+
+/* Ficha de producto */
+.ruta { display: flex; flex-wrap: wrap; gap: 6px; font-size: 14px; color: var(--texto-suave); margin-bottom: 20px; }
+.ruta a { text-decoration: none; }
+.ficha { display: flex; flex-wrap: wrap; gap: 32px 40px; align-items: flex-start; }
+.galeria { flex: 1.2 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.galeria-principal {
+  aspect-ratio: 4 / 3; border-radius: 20px; overflow: hidden; background: var(--gris-fondo); color: #6b7178;
+  display: flex; align-items: center; justify-content: center;
+}
+.galeria-principal img { width: 100%; height: 100%; object-fit: contain; }
+.galeria-principal .icono-bici { width: 200px; height: 125px; stroke-width: 1.4; }
+.miniaturas { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 10px; }
+.miniatura {
+  aspect-ratio: 4 / 3; padding: 0; border-radius: 12px; overflow: hidden; cursor: pointer;
+  background: var(--gris-fondo); border: 2px solid transparent;
+}
+.miniatura img { width: 100%; height: 100%; object-fit: cover; }
+.miniatura[aria-pressed="true"] { border-color: var(--azul); }
+.ficha-datos { flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.etiquetas { display: flex; flex-wrap: wrap; gap: 8px; }
+.estado { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+.estado-disponible { background: #e3f1e8; color: #145c38; }
+.estado-reservado { background: #fff3d6; color: #6b4a00; }
+.estado-vendido { background: var(--gris-fondo); color: var(--texto-medio); }
+.titulo-producto { font-family: var(--titulos); font-weight: 400; font-size: clamp(34px, 4.5vw, 48px); line-height: 1.05; }
+.ficha-precio { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.precio-grande { font-size: 34px; font-weight: 700; }
+.descripcion { color: var(--texto-medio); margin: 0; }
+.descripcion p { margin: 0 0 10px; }
+.descripcion p:last-child { margin-bottom: 0; }
+.caracteristicas {
+  margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px;
+  background: var(--gris-linea); border: 1px solid var(--gris-linea); border-radius: 14px; overflow: hidden;
+}
+.caracteristicas div { background: var(--blanco); padding: 12px 16px; }
+.caracteristicas dt { font-size: 13px; color: var(--texto-suave); }
+.caracteristicas dd { margin: 0; font-weight: 600; }
+.acciones { display: flex; flex-direction: column; gap: 10px; padding-top: 4px; }
+.nota, .aviso {
+  display: flex; gap: 12px; align-items: flex-start; margin: 0;
+  background: var(--gris-panel); border-radius: 14px; padding: 14px 16px; font-size: 14px; color: var(--texto-medio);
+}
+.aviso { background: #fff3d6; color: #4d3500; }
+.seccion-relacionados { padding-top: 64px; }
+
+/* Taller */
+.grilla-servicios { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.servicio { display: flex; flex-direction: column; gap: 6px; padding: 22px 24px; background: var(--blanco); border: 1px solid var(--gris-linea); border-radius: var(--radio); }
+.servicio-cabecera { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+.servicio-nombre { font-family: var(--cuerpo); font-weight: 700; font-size: 18px; }
+.servicio-precio { font-weight: 700; font-size: 18px; color: var(--azul); }
+.servicio-detalle { margin: 0; color: var(--texto-suave); font-size: 15px; }
+
+.vacio-pagina { padding-top: 72px; }
+
+/* Pie */
+.pie { background: var(--oscuro); color: var(--gris-borde); margin-top: 0; }
+.pie-fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 20px; padding-top: 36px; padding-bottom: 36px; }
+.pie-marca { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+.pie-marca img { width: 44px; height: 44px; }
+.pie-menu { display: flex; flex-wrap: wrap; gap: 0 20px; font-size: 14px; }
+.pie-menu a { color: var(--claro); text-decoration: none; padding: 10px 0; }
+.pie-menu a:hover { color: var(--cobre); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .tarjeta { transition: none; }
+  .tarjeta:hover { transform: none; }
+}

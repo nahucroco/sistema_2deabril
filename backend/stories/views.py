@@ -1,11 +1,13 @@
 from django.db import transaction
+from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .models import InstagramAccount, StoryPost
+from .models import InstagramAccount, Repeticion, StoryPost
 from .serializers import (
     InstagramAccountSerializer,
+    RepeticionSerializer,
     StoryPostSerializer,
     SugerirTextoSerializer,
 )
@@ -43,6 +45,22 @@ class StoryPostViewSet(viewsets.ModelViewSet):
         transaction.on_commit(lambda: publicar_post.delay(post.id))
         return Response(self.get_serializer(post).data)
 
+    @action(detail=False, methods=["get"])
+    def registro(self, request):
+        """Lo que se ve hoy en Instagram y las ultimas publicaciones (con sus errores)."""
+        hace_un_dia = timezone.now() - timezone.timedelta(hours=24)
+        en_instagram = StoryPost.objects.filter(
+            estado=StoryPost.Estado.PUBLICADA, publicado_en__gte=hace_un_dia
+        ).order_by("-publicado_en")
+        recientes = StoryPost.objects.exclude(estado=StoryPost.Estado.BORRADOR).order_by("-actualizado")[:20]
+        contexto = self.get_serializer_context()
+        return Response(
+            {
+                "en_instagram": StoryPostSerializer(en_instagram, many=True, context=contexto).data,
+                "recientes": StoryPostSerializer(recientes, many=True, context=contexto).data,
+            }
+        )
+
     @action(detail=False, methods=["post"])
     def sugerir_texto(self, request):
         entrada = SugerirTextoSerializer(data=request.data)
@@ -52,3 +70,10 @@ class StoryPostViewSet(viewsets.ModelViewSet):
         except ai_copy.AICopyError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         return Response(resultado)
+
+
+class RepeticionViewSet(viewsets.ModelViewSet):
+    """Historias que se vuelven a publicar solas cada tantos dias."""
+
+    queryset = Repeticion.objects.select_related("historia")
+    serializer_class = RepeticionSerializer

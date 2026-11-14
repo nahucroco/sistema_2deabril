@@ -12,9 +12,10 @@ from stories import tasks
 
 
 class Command(BaseCommand):
-    help = "Publica las historias programadas vencidas, destraba las colgadas y renueva tokens por vencer."
+    help = "Publica las historias programadas vencidas y las que se repiten solas, destraba las colgadas y renueva tokens por vencer."
 
     def handle(self, *args, **options):
         tasks.marcar_publicaciones_colgadas()
         tasks.publish_due_posts()
+        tasks.publicar_repeticiones()
         tasks.refresh_expiring_tokens()

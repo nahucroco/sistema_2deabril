@@ -49,6 +49,12 @@ export const api = {
       return res.json();
     }),
   publicarAhora: (id) => request(`/historias/${id}/publicar_ahora/`, { method: "POST" }),
+  registro: () => request("/historias/registro/"),
+  repeticiones: () => request("/repeticiones/"),
+  crearRepeticion: (datos) => request("/repeticiones/", { method: "POST", body: JSON.stringify(datos) }),
+  cambiarRepeticion: (id, datos) =>
+    request(`/repeticiones/${id}/`, { method: "PATCH", body: JSON.stringify(datos) }),
+  borrarRepeticion: (id) => request(`/repeticiones/${id}/`, { method: "DELETE" }),
   sugerirTexto: (idea, tipo) =>
     request("/historias/sugerir_texto/", { method: "POST", body: JSON.stringify({ idea, tipo }) }),
 };

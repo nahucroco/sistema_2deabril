@@ -2,11 +2,12 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from .auth_views import cerrar_sesion, iniciar_sesion, sesion
-from .views import InstagramAccountViewSet, StoryPostViewSet
+from .views import InstagramAccountViewSet, RepeticionViewSet, StoryPostViewSet
 
 router = DefaultRouter()
 router.register("cuentas", InstagramAccountViewSet, basename="cuenta")
 router.register("historias", StoryPostViewSet, basename="historia")
+router.register("repeticiones", RepeticionViewSet, basename="repeticion")
 
 urlpatterns = [
     path("sesion/", sesion, name="sesion"),

@@ -15,6 +15,10 @@ app.conf.beat_schedule = {
         "task": "stories.tasks.publish_due_posts",
         "schedule": crontab(minute="*/5"),
     },
+    "publicar-repeticiones": {
+        "task": "stories.tasks.publicar_repeticiones",
+        "schedule": crontab(minute="*/5"),
+    },
     "destrabar-publicaciones-colgadas": {
         "task": "stories.tasks.marcar_publicaciones_colgadas",
         "schedule": crontab(minute="*/5"),

@@ -6,6 +6,7 @@ import TypeStep from "./steps/TypeStep";
 import TextStep from "./steps/TextStep";
 import SaveStep from "./steps/SaveStep";
 import Login from "./Login";
+import Registro from "./Registro";
 
 const INITIAL_STATE = {
   tipo: "usada",
@@ -47,6 +48,8 @@ function Taller({ sesion, onLogout }) {
   });
   const [safeZones, setSafeZones] = useState(false);
   const [cuentas, setCuentas] = useState([]);
+  // Sube cada vez que se guarda algo, para que el registro se recargue.
+  const [version, setVersion] = useState(0);
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -104,7 +107,12 @@ function Taller({ sesion, onLogout }) {
           <PhotoStep state={state} setState={setState} />
           <TypeStep state={state} setState={setState} />
           <TextStep state={state} setState={setState} />
-          <SaveStep state={state} canvasRef={canvasRef} cuentas={cuentas} />
+          <SaveStep
+            state={state}
+            canvasRef={canvasRef}
+            cuentas={cuentas}
+            onGuardado={() => setVersion((v) => v + 1)}
+          />
         </div>
 
         <aside className="side">
@@ -116,6 +124,8 @@ function Taller({ sesion, onLogout }) {
           <p className="tag">1080 × 1920 px, formato historia 9:16</p>
         </aside>
       </div>
+
+      {cuentas.length > 0 && <Registro version={version} />}
     </div>
   );
 }

@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { api } from "../api";
+import CamposRepeticion from "../components/CamposRepeticion";
+import { REPETICION_INICIAL, datosRepeticion, textoFecha, textoFrecuencia } from "../repeticion";
 
-export default function SaveStep({ state, canvasRef, cuentas }) {
+export default function SaveStep({ state, canvasRef, cuentas, onGuardado }) {
   const [guardando, setGuardando] = useState(false);
   const [publicando, setPublicando] = useState(false);
   const [mensaje, setMensaje] = useState("");
+  const [repetir, setRepetir] = useState(false);
+  const [repeticion, setRepeticion] = useState(REPETICION_INICIAL);
   const cuenta = cuentas?.[0];
 
   function descargarPNG() {
@@ -22,25 +26,38 @@ export default function SaveStep({ state, canvasRef, cuentas }) {
     }, "image/png");
   }
 
-  async function publicarEnInstagram() {
+  // Sube la imagen armada y la deja guardada en el sistema (sin publicar).
+  async function guardarHistoria() {
     const canvas = canvasRef.current;
-    if (!canvas || !cuenta) return;
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+    const form = new FormData();
+    form.append("cuenta", cuenta.id);
+    form.append("tipo", state.tipo);
+    form.append("titulo", state.titulo);
+    form.append("detalle", state.detalle);
+    form.append("precio", state.precio);
+    form.append("imagen", blob, `historia-${state.tipo}.png`);
+    return api.crearHistoria(form);
+  }
+
+  async function publicarEnInstagram() {
+    if (!canvasRef.current || !cuenta) return;
     setPublicando(true);
     setMensaje("");
     try {
-      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
-      const form = new FormData();
-      form.append("cuenta", cuenta.id);
-      form.append("tipo", state.tipo);
-      form.append("titulo", state.titulo);
-      form.append("detalle", state.detalle);
-      form.append("precio", state.precio);
-      form.append("imagen", blob, `historia-${state.tipo}.png`);
-      const post = await api.crearHistoria(form);
-      await api.publicarAhora(post.id);
-      setMensaje("Enviada a publicar. En un momento aparece en la historia de Instagram.");
+      const post = await guardarHistoria();
+      if (repetir) {
+        const rep = await api.crearRepeticion({ historia: post.id, ...datosRepeticion(repeticion) });
+        setMensaje(
+          `Listo: se va a publicar sola, ${textoFrecuencia(rep.cada_dias).toLowerCase()}. La primera vez: ${textoFecha(rep.proxima)}.`
+        );
+      } else {
+        await api.publicarAhora(post.id);
+        setMensaje("Enviada a publicar. En un momento aparece en la historia de Instagram.");
+      }
+      onGuardado?.();
     } catch (err) {
-      setMensaje(err.message || "No se pudo publicar. Probá de nuevo en un momento.");
+      setMensaje(err.message || "No se pudo guardar. Probá de nuevo en un momento.");
     } finally {
       setPublicando(false);
     }
@@ -51,13 +68,33 @@ export default function SaveStep({ state, canvasRef, cuentas }) {
       <div className="num">4</div>
       <div className="body">
         <h2>Guardarla</h2>
+        {cuenta && (
+          <label className="check">
+            <input type="checkbox" checked={repetir} onChange={(e) => setRepetir(e.target.checked)} />
+            Que se publique sola cada tanto
+          </label>
+        )}
+        {cuenta && repetir && (
+          <>
+            <CamposRepeticion idBase="nueva-rep" valor={repeticion} onChange={setRepeticion} />
+            <p className="hint">
+              Las historias duran 24 horas: con "Todos los días" queda siempre visible. Se publica dentro de
+              los 5 minutos siguientes a la hora elegida.
+            </p>
+          </>
+        )}
         <div className="actions">
           <button type="button" className="btn" disabled={guardando} onClick={descargarPNG}>
             Guardar imagen
           </button>
           {cuenta && (
-            <button type="button" className="btn ghost" disabled={publicando} onClick={publicarEnInstagram}>
-              Publicar en Instagram ahora
+            <button
+              type="button"
+              className="btn ghost"
+              disabled={publicando || (repetir && !repeticion.hora)}
+              onClick={publicarEnInstagram}
+            >
+              {repetir ? "Programar repetición" : "Publicar en Instagram ahora"}
             </button>
           )}
         </div>

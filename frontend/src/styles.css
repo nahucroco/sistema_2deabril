@@ -71,7 +71,7 @@ header p { margin: 8px 0 0; color: var(--muted); max-width: 52ch; }
 .step h2 { font-family: var(--display); font-weight: 400; font-size: 28px; line-height: 1; margin: 2px 0 14px; }
 .body { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 label, .lbl { font-weight: 600; font-size: 15px; display: block; margin-bottom: 5px; }
-input[type="text"], input[type="password"], textarea { width: 100%; font: inherit; color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: 6px; padding: 11px 12px; }
+input[type="text"], input[type="password"], input[type="time"], input[type="date"], select, textarea { width: 100%; font: inherit; color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: 6px; padding: 11px 12px; }
 textarea { resize: vertical; min-height: 74px; }
 input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
@@ -128,3 +128,25 @@ button { font: inherit; cursor: pointer; }
 .panel-links a:hover { text-decoration: underline; }
 .logout { background: transparent; color: var(--muted); border: 2px solid var(--line); border-radius: 6px; padding: 6px 12px; font-size: 15px; }
 .login-form { max-width: 360px; display: flex; flex-direction: column; gap: 16px; padding-top: 22px; border-top: 2px solid var(--line); }
+
+/* Registro de historias */
+.registro { margin-top: 40px; padding-top: 28px; border-top: 2px solid var(--line); display: flex; flex-direction: column; gap: 14px; }
+.registro-cabecera { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.registro h2 { font-family: var(--display); font-weight: 400; font-size: 32px; line-height: 1; margin: 0; }
+.registro h3 { font-family: var(--display); font-weight: 400; font-size: 24px; margin: 14px 0 0; }
+.tiras { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+.tira { display: flex; flex-direction: column; gap: 4px; position: relative; }
+.tira img { width: 100%; aspect-ratio: 9 / 16; object-fit: cover; border-radius: 8px; background: var(--surface); box-shadow: 0 0 0 2px var(--line); }
+.tira-titulo { font-weight: 600; overflow-wrap: anywhere; }
+.tira-dato { color: var(--muted); font-size: 14px; }
+.marca-auto { position: absolute; top: 8px; left: 8px; background: var(--hi); color: var(--on-hi); font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.repeticiones, .recientes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.repeticion, .reciente { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; align-items: start; background: var(--surface); border: 2px solid var(--line); border-radius: 8px; padding: 12px; }
+.repeticion img, .reciente img { width: 64px; aspect-ratio: 9 / 16; object-fit: cover; border-radius: 6px; }
+.repeticion.pausada img { opacity: .45; }
+.repeticion-datos { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.repeticion-form { display: flex; flex-direction: column; gap: 12px; padding-top: 6px; }
+.estado { font-weight: 700; font-size: 13px; padding: 1px 8px; border-radius: 999px; border: 2px solid var(--line); color: var(--ink); }
+.estado-publicada { border-color: var(--accent); color: var(--accent); }
+.estado-error { border-color: var(--warn); color: var(--warn); }
+.btn.peligro { color: var(--warn); border-color: var(--warn); }

@@ -3,7 +3,7 @@ import logging
 from celery import shared_task
 from django.utils import timezone
 
-from .models import InstagramAccount, StoryPost
+from .models import InstagramAccount, Repeticion, StoryPost
 from .services import meta_graph
 
 logger = logging.getLogger(__name__)
@@ -64,6 +64,43 @@ def publish_due_posts() -> None:
         )
         if tomada:
             publicar_post.delay(post_id)
+
+
+@shared_task
+def publicar_repeticiones() -> int:
+    """
+    Tarea periodica (cada 5 min): publica de nuevo las historias que se repiten
+    solas y ya llegaron a su horario. Devuelve cuantas disparo.
+    """
+    ahora = timezone.now()
+    disparadas = 0
+    for rep in Repeticion.objects.filter(activa=True, proxima__lte=ahora).select_related("historia"):
+        if rep.termino(rep.proxima):
+            Repeticion.objects.filter(pk=rep.pk).update(activa=False)
+            continue
+        siguiente = rep.siguiente_despues(ahora)
+        # Se reserva el turno moviendo "proxima" solo si nadie lo movio antes:
+        # dos corridas en paralelo no publican la misma historia dos veces.
+        tomada = Repeticion.objects.filter(pk=rep.pk, activa=True, proxima=rep.proxima).update(
+            proxima=siguiente, ultima=ahora, activa=not rep.termino(siguiente)
+        )
+        if not tomada:
+            continue
+        base = rep.historia
+        post = StoryPost.objects.create(
+            cuenta=base.cuenta,
+            tipo=base.tipo,
+            imagen=base.imagen.name,  # misma imagen, sin copiar el archivo
+            titulo=base.titulo,
+            detalle=base.detalle,
+            precio=base.precio,
+            caption=base.caption,
+            estado=StoryPost.Estado.PUBLICANDO,
+            repeticion=rep,
+        )
+        publicar_post.delay(post.id)
+        disparadas += 1
+    return disparadas
 
 
 MINUTOS_PARA_DAR_POR_COLGADA = 15

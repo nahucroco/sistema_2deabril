@@ -50,6 +50,7 @@ export const api = {
     }),
   publicarAhora: (id) => request(`/historias/${id}/publicar_ahora/`, { method: "POST" }),
   registro: () => request("/historias/registro/"),
+  cancelarProgramada: (id) => request(`/historias/${id}/cancelar/`, { method: "POST" }),
   repeticiones: () => request("/repeticiones/"),
   crearRepeticion: (datos) => request("/repeticiones/", { method: "POST", body: JSON.stringify(datos) }),
   cambiarRepeticion: (id, datos) =>

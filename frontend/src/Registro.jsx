@@ -17,8 +17,10 @@ const ESTADOS = {
   error: "Error",
 };
 
-// Registro de historias: lo que se ve hoy en Instagram, las que se repiten
-// solas y las últimas publicaciones (con sus errores).
+const FORMATOS = { historia: "Historia", feed: "Feed" };
+
+// Registro de publicaciones: las historias que se ven hoy en Instagram, lo
+// programado, lo que se repite solo y lo último publicado (con sus errores).
 export default function Registro({ version }) {
   const [registro, setRegistro] = useState(null);
   const [repeticiones, setRepeticiones] = useState([]);
@@ -57,14 +59,14 @@ export default function Registro({ version }) {
   return (
     <section className="registro" aria-labelledby="registro-titulo">
       <div className="registro-cabecera">
-        <h2 id="registro-titulo">Registro de historias</h2>
+        <h2 id="registro-titulo">Registro de publicaciones</h2>
         <button type="button" className="btn ghost small" onClick={cargar}>
           Actualizar
         </button>
       </div>
       {error && <p className="msg">{error}</p>}
 
-      <h3>En Instagram ahora</h3>
+      <h3>Historias visibles ahora</h3>
       {registro.en_instagram.length ? (
         <ul className="tiras">
           {registro.en_instagram.map((p) => (
@@ -80,7 +82,39 @@ export default function Registro({ version }) {
         <p className="hint">No hay historias visibles en este momento.</p>
       )}
 
-      <h3>Se publican solas</h3>
+      <h3>Programadas</h3>
+      {registro.programadas.length ? (
+        <ul className="recientes">
+          {registro.programadas.map((p) => (
+            <li key={p.id} className={`reciente${p.formato === "feed" ? " es-feed" : ""}`}>
+              <img src={p.imagen} alt="" />
+              <div className="repeticion-datos">
+                <span className="tira-titulo">{p.titulo || "Sin título"}</span>
+                <span className="tira-dato">
+                  {FORMATOS[p.formato]} · sale el {textoFecha(p.programada_para)}
+                </span>
+                <div className="actions">
+                  <button
+                    type="button"
+                    className="btn ghost small peligro"
+                    onClick={() => {
+                      if (window.confirm("¿Cancelar esta publicación programada?")) {
+                        accion(api.cancelarProgramada(p.id));
+                      }
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="hint">Nada programado. Al guardar, elegí "En una fecha y hora".</p>
+      )}
+
+      <h3>Historias que se repiten solas</h3>
       {repeticiones.length ? (
         <ul className="repeticiones">
           {repeticiones.map((r) => (
@@ -98,8 +132,8 @@ export default function Registro({ version }) {
         </ul>
       ) : (
         <p className="hint">
-          Ninguna todavía. Al guardar una historia, marcá "Que se publique sola cada tanto", o usá "Repetir" en
-          una de las últimas publicaciones.
+          Ninguna todavía. Al guardar una historia, elegí "Que se repita sola", o usá "Repetir" en una de las
+          últimas historias.
         </p>
       )}
 
@@ -116,7 +150,7 @@ export default function Registro({ version }) {
           ))}
         </ul>
       ) : (
-        <p className="hint">Todavía no se publicó ninguna historia desde el Taller.</p>
+        <p className="hint">Todavía no se publicó nada desde el Taller.</p>
       )}
     </section>
   );
@@ -187,13 +221,13 @@ function FilaReciente({ post, onReintentar, onRepetir }) {
   const cuando = post.publicado_en || post.programada_para || post.actualizado;
 
   return (
-    <li className="reciente">
+    <li className={`reciente${post.formato === "feed" ? " es-feed" : ""}`}>
       <img src={post.imagen} alt="" />
       <div className="repeticion-datos">
         <span className="tira-titulo">{post.titulo || "Sin título"}</span>
         <span className="tira-dato">
           <span className={`estado estado-${post.estado}`}>{ESTADOS[post.estado] || post.estado}</span>{" "}
-          {textoFecha(cuando)}
+          {FORMATOS[post.formato]} · {textoFecha(cuando)}
           {post.repeticion && " · automática"}
         </span>
         {post.estado === "error" && post.error_mensaje && <span className="msg">{post.error_mensaje}</span>}
@@ -223,9 +257,11 @@ function FilaReciente({ post, onReintentar, onRepetir }) {
                 Reintentar
               </button>
             )}
-            <button type="button" className="btn ghost small" onClick={() => setRepitiendo(true)}>
-              Repetir
-            </button>
+            {post.formato !== "feed" && (
+              <button type="button" className="btn ghost small" onClick={() => setRepitiendo(true)}>
+                Repetir
+              </button>
+            )}
           </div>
         )}
       </div>

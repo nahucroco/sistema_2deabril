@@ -1,4 +1,4 @@
-import { COLORS, TEMPLATES } from "../brand";
+import { COLORS, FORMATOS, TEMPLATES } from "../brand";
 
 export default function TypeStep({ state, setState }) {
   return (
@@ -6,7 +6,27 @@ export default function TypeStep({ state, setState }) {
       <div className="num">2</div>
       <div className="body">
         <h2>Qué vas a publicar</h2>
-        <div className="chips" role="radiogroup" aria-label="Tipo de historia">
+        <div>
+          <span className="lbl">Dónde va</span>
+          <div className="chips" role="radiogroup" aria-label="Dónde va">
+            {Object.entries(FORMATOS).map(([key, f]) => (
+              <label className="chip" key={key}>
+                <input
+                  type="radio"
+                  name="formato"
+                  checked={state.formato === key}
+                  onChange={() => setState((s) => ({ ...s, formato: key }))}
+                />
+                <span>
+                  {f.nombre} <small className="chip-nota">{f.proporcion}</small>
+                </span>
+              </label>
+            ))}
+          </div>
+        </div>
+        <div>
+        <span className="lbl">Plantilla</span>
+        <div className="chips" role="radiogroup" aria-label="Plantilla">
           {Object.entries(TEMPLATES).map(([key, t]) => (
             <label className="chip" key={key}>
               <input
@@ -18,6 +38,7 @@ export default function TypeStep({ state, setState }) {
               <span>{t.name}</span>
             </label>
           ))}
+        </div>
         </div>
         <div>
           <span className="lbl">Color principal</span>

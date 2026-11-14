@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { STORY_HEIGHT, STORY_WIDTH } from "../brand";
+import { FORMATOS } from "../brand";
 import { drawStory } from "../drawStory";
 import { makeSampleImage } from "../sampleImage";
 
@@ -10,6 +10,8 @@ export default function StoryCanvas({ state, onPan, showSafeZones, canvasRef: ex
   const canvasRef = externalRef || internalRef;
   const logoRef = useRef(null);
   const dragRef = useRef(null);
+  const esFeed = state.formato === "feed";
+  const { ancho, alto } = FORMATOS[esFeed ? "feed" : "historia"];
 
   useEffect(() => {
     const img = new Image();
@@ -44,18 +46,18 @@ export default function StoryCanvas({ state, onPan, showSafeZones, canvasRef: ex
   }
 
   return (
-    <div className="phone">
+    <div className={esFeed ? "phone feed" : "phone"}>
       <canvas
         ref={canvasRef}
-        width={STORY_WIDTH}
-        height={STORY_HEIGHT}
-        aria-label="Vista previa de la historia"
+        width={ancho}
+        height={alto}
+        aria-label={esFeed ? "Vista previa de la publicación del feed" : "Vista previa de la historia"}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       />
-      {showSafeZones && (
+      {showSafeZones && !esFeed && (
         <>
           <div className="zone t">Acá Instagram pone el nombre de la cuenta</div>
           <div className="zone b">Acá va la barra para responder</div>
@@ -63,8 +65,4 @@ export default function StoryCanvas({ state, onPan, showSafeZones, canvasRef: ex
       )}
     </div>
   );
-}
-
-export function canvasToBlob(canvas) {
-  return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
 }

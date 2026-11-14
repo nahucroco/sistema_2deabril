@@ -1,7 +1,7 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-// El Taller de Historias vive en /panel/: la raiz del sitio es la web publica
+// El Taller de Publicaciones vive en /panel/: la raiz del sitio es la web publica
 // (Django). En desarrollo, Vite proxea al backend en :8000 las rutas que son
 // de Django, para no pelear con CORS ni con las cookies de sesion.
 export default defineConfig({

@@ -116,6 +116,13 @@ def publicar_historia(ig_user_id: str, access_token: str, image_url: str) -> tup
     return container_id, media_id
 
 
+def publicar_feed(ig_user_id: str, access_token: str, image_url: str, caption: str = "") -> tuple[str, str]:
+    """Atajo: crea el contenedor del post de feed (JPEG) y lo publica. Devuelve (container_id, media_id)."""
+    container_id = crear_contenedor_feed(ig_user_id, access_token, image_url, caption)
+    media_id = publicar(ig_user_id, access_token, container_id)
+    return container_id, media_id
+
+
 def cuentas_instagram_asignadas(access_token: str) -> list[dict]:
     """
     Cuentas de Instagram a las que tiene acceso un token de Unified login

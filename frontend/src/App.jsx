@@ -9,6 +9,7 @@ import Login from "./Login";
 import Registro from "./Registro";
 
 const INITIAL_STATE = {
+  formato: "historia",
   tipo: "usada",
   color: "azul",
   imagen: null,
@@ -19,6 +20,7 @@ const INITIAL_STATE = {
   detalle: "Impecable. 21 velocidades y frenos a disco.",
   precio: "450000",
   whatsapp: "",
+  caption: "",
 };
 
 export default function App() {
@@ -84,11 +86,11 @@ function Taller({ sesion, onLogout }) {
         <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Bicicletería 2 de Abril, repuestos y taller" />
         <div>
           <h1>
-            Taller de <span>Historias</span>
+            Taller de <span>Publicaciones</span>
           </h1>
           <p>
-            Elegí una foto, contá qué es y llevate la historia lista para Instagram. La foto queda
-            tal cual: solo se le suma el marco, el precio y el contacto.
+            Elegí una foto, contá qué es y llevate la historia o el posteo listo para Instagram. La
+            foto queda tal cual: solo se le suma el marco, el precio y el contacto.
           </p>
         </div>
         <nav className="panel-links" aria-label="Panel">
@@ -117,11 +119,17 @@ function Taller({ sesion, onLogout }) {
 
         <aside className="side">
           <StoryCanvas state={state} onPan={pan} showSafeZones={safeZones} canvasRef={canvasRef} />
-          <label className="check">
-            <input type="checkbox" checked={safeZones} onChange={(e) => setSafeZones(e.target.checked)} />
-            Mostrar lo que tapa Instagram
-          </label>
-          <p className="tag">1080 × 1920 px, formato historia 9:16</p>
+          {state.formato === "feed" ? (
+            <p className="tag">1080 × 1350 px, publicación del feed 4:5</p>
+          ) : (
+            <>
+              <label className="check">
+                <input type="checkbox" checked={safeZones} onChange={(e) => setSafeZones(e.target.checked)} />
+                Mostrar lo que tapa Instagram
+              </label>
+              <p className="tag">1080 × 1920 px, formato historia 9:16</p>
+            </>
+          )}
         </aside>
       </div>
 

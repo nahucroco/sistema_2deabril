@@ -3,7 +3,7 @@
 Todo corre en una sola máquina virtual gratis, con Docker Compose:
 
 ```
-Internet ──HTTPS──> Caddy ──┬── /panel ────────> el Taller de Historias (React compilado)
+Internet ──HTTPS──> Caddy ──┬── /panel ────────> el Taller de Publicaciones (React compilado)
                             ├── /media ────────> fotos (Meta descarga las historias de acá)
                             ├── /static ───────> CSS de la web y archivos del admin
                             └── resto ─────────> Django (gunicorn): web pública, /api, /admin ──> Postgres
@@ -165,7 +165,7 @@ dc exec backend python manage.py conectar_instagram
 Listo:
 
 - `https://TU_DOMINIO` es la web pública para los clientes.
-- `https://TU_DOMINIO/panel/` es el Taller de Historias (pide login).
+- `https://TU_DOMINIO/panel/` es el Taller de Publicaciones (pide login).
 - `https://TU_DOMINIO/admin/` → "Web pública": productos, servicios del taller
   y datos del negocio (WhatsApp, dirección, horarios).
 

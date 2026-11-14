@@ -71,7 +71,7 @@ header p { margin: 8px 0 0; color: var(--muted); max-width: 52ch; }
 .step h2 { font-family: var(--display); font-weight: 400; font-size: 28px; line-height: 1; margin: 2px 0 14px; }
 .body { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 label, .lbl { font-weight: 600; font-size: 15px; display: block; margin-bottom: 5px; }
-input[type="text"], input[type="password"], input[type="time"], input[type="date"], select, textarea { width: 100%; font: inherit; color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: 6px; padding: 11px 12px; }
+input[type="text"], input[type="password"], input[type="time"], input[type="date"], input[type="datetime-local"], select, textarea { width: 100%; font: inherit; color: var(--ink); background: var(--surface); border: 2px solid var(--line); border-radius: 6px; padding: 11px 12px; }
 textarea { resize: vertical; min-height: 74px; }
 input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
@@ -150,3 +150,8 @@ button { font: inherit; cursor: pointer; }
 .estado-publicada { border-color: var(--accent); color: var(--accent); }
 .estado-error { border-color: var(--warn); color: var(--warn); }
 .btn.peligro { color: var(--warn); border-color: var(--warn); }
+
+/* Publicaciones del feed (4:5) */
+.phone.feed { aspect-ratio: 4 / 5; }
+.es-feed img { aspect-ratio: 4 / 5; }
+.chip-nota { font-family: var(--body); font-size: 13px; opacity: .7; }

@@ -61,7 +61,7 @@ npm install
 npm run dev
 ```
 
-El Taller de Historias abre en `http://localhost:5173/panel/`. En desarrollo,
+El Taller de Publicaciones abre en `http://localhost:5173/panel/`. En desarrollo,
 Vite proxea `/api`, `/admin`, `/static` y `/media` hacia
 `http://localhost:8000` (el backend de Django).
 
@@ -99,7 +99,9 @@ docker compose up --build
 - [x] Web pública: inicio, catálogo con filtros, ficha de producto con
       WhatsApp y Mercado Libre, página del taller. Se administra desde `/admin/`.
 - [ ] Sección de productos dentro del panel y "crear historia desde un producto".
-- [ ] Posts de feed y Reels (hoy el foco es historias).
+- [x] Posts del feed (4:5): publicar ahora o programados, con texto propio.
+- [x] Historias que se repiten solas y registro de publicaciones.
+- [ ] Reels.
 - [ ] Bandeja de comentarios/mensajes de Instagram con respuestas sugeridas.
 
 ## Ideas para después

@@ -7,7 +7,7 @@
 		max_size 20MB
 	}
 
-	# El Taller de Historias (React compilado con base /panel/).
+	# El Taller de Publicaciones (React compilado con base /panel/).
 	redir /panel /panel/
 	handle_path /panel/* {
 		root * /srv/frontend

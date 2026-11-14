@@ -19,6 +19,8 @@ export default function TextStep({ state, setState }) {
       const data = await api.sugerirTexto(idea.trim(), state.tipo);
       setOpciones(data.opciones || []);
       setCaption(data.caption || "");
+      // En el feed el texto sugerido va directo al campo de la publicacion.
+      if (data.caption) setState((s) => ({ ...s, caption: data.caption }));
       if (data.precio) setState((s) => ({ ...s, precio: data.precio }));
       setNota("Tocá la opción que más te guste. Después la podés corregir abajo.");
     } catch (err) {
@@ -58,7 +60,7 @@ export default function TextStep({ state, setState }) {
               ))}
             </div>
           )}
-          {caption && (
+          {caption && state.formato !== "feed" && (
             <div className="cap">
               <span className="lbl">Texto para acompañar en el feed</span>
               <p>{caption}</p>
@@ -72,6 +74,20 @@ export default function TextStep({ state, setState }) {
             </div>
           )}
         </div>
+        {state.formato === "feed" && (
+          <div>
+            <label htmlFor="caption">Texto de la publicación</label>
+            <textarea
+              id="caption"
+              rows={5}
+              maxLength={2200}
+              placeholder="Lo que aparece abajo de la foto en el feed. Podés sumar hashtags al final."
+              value={state.caption}
+              onChange={(e) => setState((s) => ({ ...s, caption: e.target.value }))}
+            />
+            <p className="hint">{state.caption.length} / 2200 caracteres</p>
+          </div>
+        )}
         <div>
           <label htmlFor="titulo">Título</label>
           <input

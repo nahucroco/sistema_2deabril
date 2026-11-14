@@ -49,3 +49,10 @@ export const TEMPLATES = {
 
 export const STORY_WIDTH = 1080;
 export const STORY_HEIGHT = 1920;
+
+// Medidas de cada formato de Instagram. El feed usa 4:5, que es el que más
+// ocupa la pantalla del celular sin que Instagram lo recorte.
+export const FORMATOS = {
+  historia: { nombre: "Historia", ancho: STORY_WIDTH, alto: STORY_HEIGHT, proporcion: "9:16" },
+  feed: { nombre: "Publicación del feed", ancho: 1080, alto: 1350, proporcion: "4:5" },
+};

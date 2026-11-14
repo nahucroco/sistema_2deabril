@@ -38,7 +38,11 @@ class InstagramAccount(models.Model):
 
 
 class StoryPost(models.Model):
-    """Una historia (o mas adelante, post de feed) generada en el taller."""
+    """Una publicacion armada en el Taller: historia (9:16) o post del feed (4:5)."""
+
+    class Formato(models.TextChoices):
+        HISTORIA = "historia", "Historia"
+        FEED = "feed", "Publicación del feed"
 
     class Tipo(models.TextChoices):
         OFERTA = "oferta", "Oferta"
@@ -55,6 +59,7 @@ class StoryPost(models.Model):
         ERROR = "error", "Error al publicar"
 
     cuenta = models.ForeignKey(InstagramAccount, on_delete=models.CASCADE, related_name="posts")
+    formato = models.CharField(max_length=10, choices=Formato.choices, default=Formato.HISTORIA)
     tipo = models.CharField(max_length=20, choices=Tipo.choices)
     imagen = models.ImageField(upload_to="historias/%Y/%m/")
 
@@ -84,8 +89,8 @@ class StoryPost(models.Model):
     publicado_en = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        verbose_name = "Historia"
-        verbose_name_plural = "Historias"
+        verbose_name = "Publicación"
+        verbose_name_plural = "Publicaciones"
         ordering = ["-creado"]
 
     def __str__(self):
@@ -108,8 +113,8 @@ class StoryPost(models.Model):
 
     @property
     def vence_en(self):
-        """Cuando deja de verse en Instagram (las historias duran 24 horas)."""
-        if self.estado != self.Estado.PUBLICADA or not self.publicado_en:
+        """Cuando deja de verse en Instagram (las historias duran 24 horas; el feed queda)."""
+        if self.formato != self.Formato.HISTORIA or self.estado != self.Estado.PUBLICADA or not self.publicado_en:
             return None
         return self.publicado_en + timezone.timedelta(hours=24)
 

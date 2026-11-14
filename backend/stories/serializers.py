@@ -21,6 +21,7 @@ class StoryPostSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "cuenta",
+            "formato",
             "tipo",
             "imagen",
             "imagen_url_publica",
@@ -51,6 +52,25 @@ class StoryPostSerializer(serializers.ModelSerializer):
         ]
 
 
+    def validate(self, datos):
+        formato = datos.get("formato", getattr(self.instance, "formato", StoryPost.Formato.HISTORIA))
+        if formato == StoryPost.Formato.FEED and len(datos.get("caption", "")) > 2200:
+            raise serializers.ValidationError({"caption": "Instagram acepta hasta 2200 caracteres."})
+        return datos
+
+    def validate_programada_para(self, valor):
+        # Margen de un minuto por la diferencia de reloj entre el navegador y el servidor.
+        if valor and valor < timezone.now() - timezone.timedelta(minutes=1):
+            raise serializers.ValidationError("Esa fecha y hora ya pasaron.")
+        return valor
+
+    def create(self, validated_data):
+        # Si viene con fecha y hora, queda programada: la publica la tarea periodica.
+        if validated_data.get("programada_para"):
+            validated_data["estado"] = StoryPost.Estado.PROGRAMADA
+        return super().create(validated_data)
+
+
 class RepeticionSerializer(serializers.ModelSerializer):
     imagen = serializers.ImageField(source="historia.imagen", read_only=True)
 
@@ -64,6 +84,8 @@ class RepeticionSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("No se puede cambiar la historia de una repetición: creá otra.")
         if not historia.imagen:
             raise serializers.ValidationError("La historia no tiene imagen.")
+        if historia.formato != StoryPost.Formato.HISTORIA:
+            raise serializers.ValidationError("Solo las historias se pueden repetir: los posts del feed se publican una vez.")
         return historia
 
     def validate_hasta(self, hasta):

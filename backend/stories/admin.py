@@ -15,8 +15,8 @@ class InstagramAccountAdmin(admin.ModelAdmin):
 
 @admin.register(StoryPost)
 class StoryPostAdmin(admin.ModelAdmin):
-    list_display = ("id", "tipo", "titulo", "estado", "cuenta", "repeticion", "programada_para", "publicado_en")
-    list_filter = ("estado", "tipo", "cuenta")
+    list_display = ("id", "formato", "tipo", "titulo", "estado", "cuenta", "repeticion", "programada_para", "publicado_en")
+    list_filter = ("estado", "formato", "tipo", "cuenta")
     readonly_fields = ("ig_container_id", "ig_media_id", "error_mensaje", "creado", "actualizado", "publicado_en")
     search_fields = ("titulo", "detalle", "caption")
 

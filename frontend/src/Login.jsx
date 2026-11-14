@@ -26,7 +26,7 @@ export default function Login({ onLogin }) {
         <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Bicicletería 2 de Abril, repuestos y taller" />
         <div>
           <h1>
-            Taller de <span>Historias</span>
+            Taller de <span>Publicaciones</span>
           </h1>
           <p>Entrá con tu usuario para armar y publicar historias.</p>
         </div>

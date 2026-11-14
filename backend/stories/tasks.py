@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def publicar_post(post_id: int) -> None:
-    """Publica una historia puntual ya sea al tocar 'Publicar ahora' o cuando Celery beat la encuentra vencida."""
+    """Publica una historia o un post del feed, al tocar 'Publicar ahora' o cuando le llega el horario programado."""
     try:
         post = StoryPost.objects.select_related("cuenta").get(pk=post_id)
     except StoryPost.DoesNotExist:
@@ -31,9 +31,14 @@ def publicar_post(post_id: int) -> None:
     image_url = post.imagen_url_publica
 
     try:
-        container_id, media_id = meta_graph.publicar_historia(
-            cuenta.ig_user_id, cuenta.access_token, image_url
-        )
+        if post.formato == StoryPost.Formato.FEED:
+            container_id, media_id = meta_graph.publicar_feed(
+                cuenta.ig_user_id, cuenta.access_token, image_url, post.caption
+            )
+        else:
+            container_id, media_id = meta_graph.publicar_historia(
+                cuenta.ig_user_id, cuenta.access_token, image_url
+            )
     except meta_graph.GraphAPIError as exc:
         post.estado = StoryPost.Estado.ERROR
         post.error_mensaje = str(exc)
@@ -89,6 +94,7 @@ def publicar_repeticiones() -> int:
         base = rep.historia
         post = StoryPost.objects.create(
             cuenta=base.cuenta,
+            formato=base.formato,
             tipo=base.tipo,
             imagen=base.imagen.name,  # misma imagen, sin copiar el archivo
             titulo=base.titulo,

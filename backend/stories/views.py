@@ -45,18 +45,35 @@ class StoryPostViewSet(viewsets.ModelViewSet):
         transaction.on_commit(lambda: publicar_post.delay(post.id))
         return Response(self.get_serializer(post).data)
 
+    @action(detail=True, methods=["post"])
+    def cancelar(self, request, pk=None):
+        """Saca una publicacion programada de la cola (queda guardada como borrador)."""
+        tomada = StoryPost.objects.filter(pk=pk, estado=StoryPost.Estado.PROGRAMADA).update(
+            estado=StoryPost.Estado.BORRADOR, programada_para=None, actualizado=timezone.now()
+        )
+        if not tomada:
+            return Response(
+                {"detail": "Ya no está programada: puede que se haya empezado a publicar."},
+                status=status.HTTP_409_CONFLICT,
+            )
+        return Response(self.get_serializer(self.get_object()).data)
+
     @action(detail=False, methods=["get"])
     def registro(self, request):
         """Lo que se ve hoy en Instagram y las ultimas publicaciones (con sus errores)."""
         hace_un_dia = timezone.now() - timezone.timedelta(hours=24)
         en_instagram = StoryPost.objects.filter(
-            estado=StoryPost.Estado.PUBLICADA, publicado_en__gte=hace_un_dia
+            formato=StoryPost.Formato.HISTORIA, estado=StoryPost.Estado.PUBLICADA, publicado_en__gte=hace_un_dia
         ).order_by("-publicado_en")
-        recientes = StoryPost.objects.exclude(estado=StoryPost.Estado.BORRADOR).order_by("-actualizado")[:20]
+        programadas = StoryPost.objects.filter(estado=StoryPost.Estado.PROGRAMADA).order_by("programada_para")
+        recientes = StoryPost.objects.exclude(
+            estado__in=[StoryPost.Estado.BORRADOR, StoryPost.Estado.PROGRAMADA]
+        ).order_by("-actualizado")[:20]
         contexto = self.get_serializer_context()
         return Response(
             {
                 "en_instagram": StoryPostSerializer(en_instagram, many=True, context=contexto).data,
+                "programadas": StoryPostSerializer(programadas, many=True, context=contexto).data,
                 "recientes": StoryPostSerializer(recientes, many=True, context=contexto).data,
             }
         )

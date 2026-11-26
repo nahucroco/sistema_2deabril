@@ -7,15 +7,17 @@ import TextStep from "./steps/TextStep";
 import SaveStep from "./steps/SaveStep";
 import Login from "./Login";
 import Registro from "./Registro";
+import { FOTO_VACIA, MAX_FOTOS } from "./brand";
 
 const INITIAL_STATE = {
   formato: "historia",
   tipo: "usada",
   color: "azul",
-  imagen: null,
-  zoom: 1,
-  ox: 0,
-  oy: 0,
+  // Hasta 4 fotos, cada una con su propio encuadre. Las plantillas de siempre usan solo la primera.
+  fotos: Array.from({ length: MAX_FOTOS }, () => FOTO_VACIA),
+  fotoActiva: 0,
+  // "Solo la foto": "llenar" ocupa toda la pantalla (recorta); "entera" la muestra completa con fondo.
+  ajuste: "llenar",
   titulo: "Vairo XR 3.5 R29",
   detalle: "Impecable. 21 velocidades y frenos a disco.",
   precio: "450000",
@@ -72,11 +74,16 @@ function Taller({ sesion, onLogout }) {
       .catch(() => setCuentas([])); // sin sesion o sin cuentas cargadas: seguimos sin publicar directo
   }, []);
 
-  function pan(dx, dy) {
+  // Arrastrar en la vista previa mueve la foto que esta debajo del dedo.
+  function pan(dx, dy, lugar = 0) {
     setState((s) => ({
       ...s,
-      ox: Math.max(-1, Math.min(1, s.ox + dx)),
-      oy: Math.max(-1, Math.min(1, s.oy + dy)),
+      fotoActiva: lugar,
+      fotos: s.fotos.map((f, i) =>
+        i === lugar
+          ? { ...f, ox: Math.max(-1, Math.min(1, f.ox + dx)), oy: Math.max(-1, Math.min(1, f.oy + dy)) }
+          : f
+      ),
     }));
   }
 
@@ -106,8 +113,8 @@ function Taller({ sesion, onLogout }) {
 
       <div className="bench">
         <div className="steps">
-          <PhotoStep state={state} setState={setState} />
           <TypeStep state={state} setState={setState} />
+          <PhotoStep state={state} setState={setState} />
           <TextStep state={state} setState={setState} />
           <SaveStep
             state={state}

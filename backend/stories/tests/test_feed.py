@@ -110,3 +110,29 @@ class RegistroYRepeticionTests(Base):
         self.assertEqual([p["id"] for p in r["programadas"]], [programada.id])
         self.assertNotIn(programada.id, [p["id"] for p in r["recientes"]])
         self.assertEqual(len(r["recientes"]), 2)
+
+
+class PlantillasNuevasTests(Base):
+    def test_las_plantillas_de_varias_fotos_y_la_foto_sola_se_guardan(self):
+        for tipo in ("dos_fotos", "cuatro_fotos", "foto"):
+            r = self.crear_por_api(tipo=tipo)
+            self.assertEqual(r.status_code, 201, r.content)
+
+    def test_usada_y_taller_van_en_historia_y_en_feed(self):
+        for tipo in ("usada", "taller"):
+            for formato in ("historia", "feed"):
+                r = self.crear_por_api(tipo=tipo, formato=formato)
+                self.assertEqual(r.status_code, 201, (tipo, formato, r.content))
+
+    def test_son_solo_para_historias(self):
+        r = self.crear_por_api(tipo="cuatro_fotos", formato="feed")
+        self.assertEqual(r.status_code, 400)
+        self.assertIn("tipo", r.json())
+
+    @mock.patch("stories.views.ai_copy.sugerir_texto", return_value={"opciones": [], "caption": ""})
+    def test_se_pueden_pedir_textos_para_las_nuevas(self, sugerir):
+        r = self.client.post(
+            "/api/historias/sugerir_texto/", {"idea": "Llegaron cascos", "tipo": "dos_fotos"}, format="json"
+        )
+        self.assertEqual(r.status_code, 200)
+        sugerir.assert_called_once_with(idea="Llegaron cascos", tipo="dos_fotos")

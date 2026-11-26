@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../api";
+import { TEMPLATES } from "../brand";
 
 export default function TextStep({ state, setState }) {
   const [idea, setIdea] = useState("Vairo XR 3.5 rodado 29, usada, impecable, $450.000");
@@ -39,6 +40,12 @@ export default function TextStep({ state, setState }) {
       <div className="num">3</div>
       <div className="body">
         <h2>El texto</h2>
+        {TEMPLATES[state.tipo]?.sinTexto && (
+          <div className="next">
+            Con <b>Solo la foto</b> la historia sale sin texto encima. El título sirve igual para reconocerla
+            en el registro.
+          </div>
+        )}
         <div className="ai">
           <div>
             <label htmlFor="idea">Contalo como se lo dirías a un cliente</label>

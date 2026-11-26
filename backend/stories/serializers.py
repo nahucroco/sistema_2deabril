@@ -56,6 +56,9 @@ class StoryPostSerializer(serializers.ModelSerializer):
         formato = datos.get("formato", getattr(self.instance, "formato", StoryPost.Formato.HISTORIA))
         if formato == StoryPost.Formato.FEED and len(datos.get("caption", "")) > 2200:
             raise serializers.ValidationError({"caption": "Instagram acepta hasta 2200 caracteres."})
+        tipo = datos.get("tipo", getattr(self.instance, "tipo", None))
+        if formato == StoryPost.Formato.FEED and tipo in StoryPost.TIPOS_SOLO_HISTORIA:
+            raise serializers.ValidationError({"tipo": "Esa plantilla es solo para historias."})
         return datos
 
     def validate_programada_para(self, valor):

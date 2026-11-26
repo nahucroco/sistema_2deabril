@@ -1,4 +1,4 @@
-// Bici de ejemplo dibujada a mano, para que el paso 1 no arranque vacio.
+// Bici de ejemplo dibujada a mano, para que el paso de la foto no arranque vacio.
 // Portado del prototipo (artifact) tal cual.
 
 export function makeSampleImage() {

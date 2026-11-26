@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../api";
+import { TEMPLATES, fotosDe } from "../brand";
 import CamposRepeticion from "../components/CamposRepeticion";
 import { REPETICION_INICIAL, datosRepeticion, textoFecha, textoFrecuencia } from "../repeticion";
 
@@ -97,6 +98,11 @@ export default function SaveStep({ state, canvasRef, cuentas, onGuardado }) {
     repetir: "Programar repetición",
   }[modo];
   const faltaDato = (modo === "programar" && !fechaHora) || (modo === "repetir" && !repeticion.hora);
+  // Las plantillas de varias fotos y "Solo la foto" no salen con la bici de ejemplo.
+  const plantilla = TEMPLATES[state.tipo];
+  const fotosPedidas = fotosDe(state.tipo);
+  const exigeFotos = fotosPedidas > 1 || plantilla?.mode === "raw";
+  const faltanFotos = exigeFotos ? state.fotos.slice(0, fotosPedidas).filter((f) => !f.img).length : 0;
 
   return (
     <section className="step">
@@ -139,15 +145,25 @@ export default function SaveStep({ state, canvasRef, cuentas, onGuardado }) {
           </>
         )}
         <div className="actions">
-          <button type="button" className="btn" disabled={guardando} onClick={descargar}>
+          <button type="button" className="btn" disabled={guardando || faltanFotos > 0} onClick={descargar}>
             Guardar imagen
           </button>
           {cuenta && (
-            <button type="button" className="btn ghost" disabled={publicando || faltaDato} onClick={publicar}>
+            <button
+              type="button"
+              className="btn ghost"
+              disabled={publicando || faltaDato || faltanFotos > 0}
+              onClick={publicar}
+            >
               {textoBoton}
             </button>
           )}
         </div>
+        {faltanFotos > 0 && (
+          <p className="hint">
+            {faltanFotos === 1 ? "Falta elegir 1 foto" : `Faltan elegir ${faltanFotos} fotos`} en el paso 2.
+          </p>
+        )}
         {mensaje && <p className="msg">{mensaje}</p>}
         {!cuenta && (
           <div className="next">

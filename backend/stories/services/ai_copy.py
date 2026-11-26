@@ -17,6 +17,9 @@ TIPO_LABELS = {
     "usada": "Usada en venta",
     "taller": "Servicio de taller",
     "aviso": "Aviso",
+    "dos_fotos": "Novedades (dos fotos)",
+    "cuatro_fotos": "Novedades (cuatro fotos)",
+    "foto": "Foto sola, sin texto encima",
 }
 
 

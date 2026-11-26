@@ -50,6 +50,12 @@ class StoryPost(models.Model):
         USADA = "usada", "Usada en venta"
         TALLER = "taller", "Servicio de taller"
         AVISO = "aviso", "Aviso"
+        DOS_FOTOS = "dos_fotos", "Dos fotos"
+        CUATRO_FOTOS = "cuatro_fotos", "Cuatro fotos"
+        FOTO = "foto", "Solo la foto"
+
+    # Plantillas que existen solo para historias (9:16).
+    TIPOS_SOLO_HISTORIA = {Tipo.DOS_FOTOS, Tipo.CUATRO_FOTOS, Tipo.FOTO}
 
     class Estado(models.TextChoices):
         BORRADOR = "borrador", "Borrador"
